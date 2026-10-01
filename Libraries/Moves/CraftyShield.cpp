@@ -41,7 +41,7 @@ extern "C" void HandlerCraftyShield(BattleEventItem* item, ServerFlow* serverFlo
         HandlerParam_AddPosEffect* addEffectPos;
         addEffectPos = (HandlerParam_AddPosEffect*)BattleHandler_PushWork(serverFlow, EFFECT_ADD_POS_EFFECT, pokemonSlot);
         addEffectPos->posEffect = POSEFF_CRAFTY_SHIELD;
-        addEffectPos->targetPos = pokemonSlot;
+        addEffectPos->targetPos = Handler_PokeIDToPokePos(serverFlow, pokemonSlot);
         BattleHandler_PopWork(serverFlow, addEffectPos);
 
         HandlerParam_Message* message;

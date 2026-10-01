@@ -519,6 +519,7 @@ extern "C" b32 Handler_IsSideEffectActive(ServerFlow* serverFlow, u32 side, SIDE
 extern "C" u32 Handler_GetExistFrontPokePos(ServerFlow* serverFlow, u32 pokemonSlot);
 extern "C" u8* Handler_GetTempWork(ServerFlow* serverFlow);
 extern "C" u32 Handler_GetAllOpponentFrontPokeID(ServerFlow * serverFlow, u32 pokemonSlot, u8 * frontSlots);
+extern "C" u32 Handler_GetBattleStyle(ServerFlow * serverFlow);
 extern "C" b32 HandlerCommon_IsMonLastInTurnOrder(ServerFlow* serverFlow, u32 battleSlot);
 
 extern "C" u32 AddConditionCheckFailOverwrite(ServerFlow * serverFlow, BattleMon * defendingMon, CONDITION condition, ConditionData condData, u8 overrideMode);

@@ -147,6 +147,7 @@ extern "C" BattleEventHandlerTableEntry* EventAddDragonize(u32 * handlerAmount);
 extern "C" BattleEventHandlerTableEntry* EventAddEelevate(u32 * handlerAmount);
 extern "C" BattleEventHandlerTableEntry* EventAddFireMane(u32 * handlerAmount);
 extern "C" BattleEventHandlerTableEntry* EventAddSpicySpray(u32 * handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddAuraGuard(u32 * handlerAmount);
 
 //Natural Cure - can't find after battle status heal
 //Soundproof - update Heal Bell in Move Expansion

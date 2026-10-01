@@ -3874,3 +3874,15 @@ Symbols:
   - Name: EventAddChipAway
     Segment: 0xA7
     Address: 0x21cd1d1
+  - Name: EventAddSolarBeam
+    Segment: 0xA7
+    Address: 0x21cbc8d
+  - Name: HandlerFollowMeCheckFail
+    Segment: 0xA7
+    Address: 0x21c63dc
+  - Name: HandlerFollowMeTurnCheck
+    Segment: 0xA7
+    Address: 0x21c64dd
+  - Name: Handler_GetBattleStyle
+    Segment: 0xA7
+    Address: 0x21abcdd

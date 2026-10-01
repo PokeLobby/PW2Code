@@ -3848,6 +3848,7 @@ AbilityEventAddTableExt abilityEventAddTableExt[]{
     { ABIL_EELEVATE, EventAddEelevate, "Abilities/BeastBoost" },
     { ABIL_FIRE_MANE, EventAddFireMane, "Abilities/TypeBoost" },
     { ABIL_SPICY_SPRAY, EventAddSpicySpray, "Abilities/SpicySpray" },
+    { ABIL_AURA_GUARD, EventAddAuraGuard, "Abilities/AuraGuard" },
 };
 
 extern "C" BattleEventItem * GetAbiltiyEvent(BattleMon * battleMon, ABILITY ability, AbilityEventAddFunc func) {
@@ -5949,6 +5950,11 @@ MoveEventAddTableExt moveEventAddTableExt[] = {
     {MOVE_DARKEST_LARIAT, EventAddChipAway, nullptr},
     {MOVE_SPARKLING_ARIA, EventAddSparklingAria, "Moves/SparklingAria"},
     {MOVE_FLORAL_HEALING, EventAddFloralHealing, "Moves/FloralHealing"},
+    {MOVE_STRENGTH_SAP, EventAddStrengthSap, "Moves/StrengthSap"},
+    {MOVE_SOLAR_BLADE, EventAddSolarBeam, nullptr},
+    {MOVE_SPOTLIGHT, EventAddSpotlight, "Moves/Spotlight"},
+    {MOVE_LASER_FOCUS, EventAddLaserFocus, "Moves/LaserFocus"},
+    {MOVE_GEAR_UP, EventAddMagneticFlux, "Moves/MagneticFlux"},
 
     {MOVE_PSYCHIC_TERRAIN, EventAddPsychicTerrain, "Moves/PsychicTerrain"},
 
@@ -5972,6 +5978,7 @@ PosEffectEventAddTableExt posEffectEventAddTableExt[] = {
     {POSEFF_SPIKY_SHIELD, EventAddPosSpikyShield, "Moves/SpikyShield"},
     {POSEFF_POWDER, EventAddPosPowder, "Moves/Powder"},
     {POSEFF_BANEFUL_BUNKER, EventAddPosBanefulBunker, "Moves/BanefulBunker"},
+    {POSEFF_LASER_FOCUS, EventAddPosLaserFocus, "Moves/LaserFocus"},
 };
 
 extern "C" void CMD_ACT_MoveAnimStart(BtlvScu * btlvScu, u32 attckViewPos, u32 defViewPos, u16 moveID, u32 moveTarget, u8 effectIndex, u8 zero);

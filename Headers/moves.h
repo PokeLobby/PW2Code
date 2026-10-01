@@ -708,6 +708,8 @@ extern "C" void HandlerProtectCheckFail(BattleEventItem* item, ServerFlow* serve
 extern "C" void HandlerProtectResetCounter(BattleEventItem* item, ServerFlow* serverFlow, u32 pokemonSlot, u32* work);
 extern "C" void HandlerProtectStart(BattleEventItem * item, ServerFlow * serverFlow, u32 pokemonSlot, u32 * work);
 extern "C" void HandlerProtect(BattleEventItem* item, ServerFlow* serverFlow, u32 pokemonSlot, u32* work);
+extern "C" void HandlerFollowMeCheckFail(BattleEventItem *item, ServerFlow *serverFlow, u32 pokemonSlot, u32 *work);
+extern "C" void HandlerFollowMeTurnCheck(BattleEventItem *item, ServerFlow *serverFlow, u32 pokemonSlot, u32 *work);
 
 extern "C" BattleEventHandlerTableEntry * EventAddHex(u32 * handlerAmount);
 extern "C" BattleEventHandlerTableEntry * EventAddShadowForce(u32* handlerAmount);
@@ -718,6 +720,7 @@ extern "C" BattleEventHandlerTableEntry * EventAddBind(u32* handlerAmount);
 extern "C" BattleEventHandlerTableEntry * EventAddSmackDown(u32* handlerAmount);
 extern "C" BattleEventHandlerTableEntry * EventAddFakeOut(u32* handlerAmount);
 extern "C" BattleEventHandlerTableEntry * EventAddChipAway(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry * EventAddSolarBeam(u32* handlerAmount);
 
 extern "C" void MoveEvent_ForceRemoveItemFromBattleMon(BattleMon* battleMon, MOVE_ID moveID);
 extern "C" bool MoveEvent_CanEffectBeRegistered(u32 battleSlot, MOVE_ID moveID, u8 * output);

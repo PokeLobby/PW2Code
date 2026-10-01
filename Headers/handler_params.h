@@ -343,6 +343,15 @@ struct HandlerParam_HideTurnCancel
   HandlerParam_StrParams exStr;
 };
 
+struct SWAN_ALIGNED(4) HandlerParam_Drain
+{
+    HandlerParam_Header header;
+    u16 recoverHP;
+    u8 recoverSlot;
+    u8 damagedSlot;
+    HandlerParam_StrParams exStr;
+};
+
 extern "C" HandlerParam_Header* BattleHandler_PushWork(ServerFlow* serverFlow, BattleHandlerEffect battleHandler, u32 currentSlot);
 extern "C" void BattleHandler_PopWork(ServerFlow* serverFlow, void* handlerParms);
 extern "C" void BattleHandler_PushRun(ServerFlow* serverFlow, BattleHandlerEffect effect, u32 pokemonSlot);
