@@ -5814,15 +5814,21 @@ extern "C" b32 THUMB_BRANCH_SAFESTACK_IsUnselectableMove(BtlClientWk* client, Ba
             return 1;
         }
 #if EXPAND_MOVES
-        if (moveID == MOVE_BELCH) {
-            u32 battleSlot = BattleMon_GetID(battleMon);
-            if (!BattleField_CheckConsumedBerryFlag(battleSlot)) {
-                if (strparam) {
-                    Btlv_StringParam_Setup(strparam, 1, BATTLE_BELCH_MSGID);
-                    Btlv_StringParam_AddArg(strparam, battleSlot);
+        switch (moveID) {
+            case MOVE_BELCH:
+                {
+                    u32 battleSlot = BattleMon_GetID(battleMon);
+                    if (!BattleField_CheckConsumedBerryFlag(battleSlot)) {
+                        if (strparam) {
+                            Btlv_StringParam_Setup(strparam, 1, BATTLE_BELCH_MSGID);
+                            Btlv_StringParam_AddArg(strparam, battleSlot);
+                        }
+                        return 1;
+                    }
                 }
-                return 1;
-            }
+                break;
+            default:
+                break;
         }
 #endif
     }
@@ -5955,6 +5961,13 @@ MoveEventAddTableExt moveEventAddTableExt[] = {
     {MOVE_SPOTLIGHT, EventAddSpotlight, "Moves/Spotlight"},
     {MOVE_LASER_FOCUS, EventAddLaserFocus, "Moves/LaserFocus"},
     {MOVE_GEAR_UP, EventAddMagneticFlux, "Moves/MagneticFlux"},
+    {MOVE_POLLEN_PUFF, EventAddPollenPuff, "Moves/PollenPuff"},
+    {MOVE_ANCHOR_SHOT, EventAddSpiderWeb, nullptr},
+    {MOVE_POWER_TRIP, EventAddStoredPower, nullptr},
+    {MOVE_BURN_UP, EventAddBurnUp, "Moves/RemoveType"},
+    {MOVE_SPEED_SWAP, EventAddSpeedSwap, "Moves/SpeedSwap"},
+    {MOVE_PURIFY, EventAddPurify, "Moves/Purify"},
+    {MOVE_REVELATION_DANCE, EventAddRevelationDance, "Moves/RevelationDance"},
 
     {MOVE_PSYCHIC_TERRAIN, EventAddPsychicTerrain, "Moves/PsychicTerrain"},
 
@@ -5962,6 +5975,8 @@ MoveEventAddTableExt moveEventAddTableExt[] = {
 
     {MOVE_INFERNAL_PARADE, EventAddHex, nullptr},
     {MOVE_CEASELESS_EDGE, EventAddCeaselessEdge, "Moves/CeaselessEdge"},
+
+    {MOVE_DOUBLE_SHOCK, EventAddDoubleShock, "Moves/RemoveType"},
 };
 
 struct PosEffectEventAddTableExt

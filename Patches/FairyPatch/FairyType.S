@@ -31,6 +31,7 @@ FULL_COPY_splitTypeCore_0x3A:
     .byte 0x06, 0xDB @ blt #0x10
     .byte 0x12, 0x28 @ cmp r0, #TypeCount
     .byte 0x01, 0xDB @ blt #0x6
+    .byte 0x12, 0x20 @ movs r0, #TypeCount
     .size FULL_COPY_splitTypeCore_0x3A, . - FULL_COPY_splitTypeCore_0x3A
 
 FULL_COPY_splitTypeCore_0x4C:

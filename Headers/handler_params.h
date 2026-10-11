@@ -153,7 +153,7 @@ struct SWAN_ALIGNED(4) HandlerParam_ChangeType
     HandlerParam_Header header;
     u16 pokeType;
     u8 pokeID;
-    u8 field_7;
+    u8 skipText;
 };
 
 struct HandlerParam_SwapItem
@@ -350,6 +350,18 @@ struct SWAN_ALIGNED(4) HandlerParam_Drain
     u8 recoverSlot;
     u8 damagedSlot;
     HandlerParam_StrParams exStr;
+};
+
+struct HandlerParam_SetStat {
+  HandlerParam_Header header;
+  u16 attack;
+  u16 defense;
+  u16 spAttack;
+  u16 spDefense;
+  u16 speed;
+  u8 battleSlot;
+  u8 flags;
+  HandlerParam_StrParams exStr;
 };
 
 extern "C" HandlerParam_Header* BattleHandler_PushWork(ServerFlow* serverFlow, BattleHandlerEffect battleHandler, u32 currentSlot);

@@ -33,12 +33,18 @@ extern "C" BattleEventHandlerTableEntry* EventAddFloralHealing(u32* handlerAmoun
 extern "C" BattleEventHandlerTableEntry* EventAddStrengthSap(u32* handlerAmount);
 extern "C" BattleEventHandlerTableEntry* EventAddSpotlight(u32* handlerAmount);
 extern "C" BattleEventHandlerTableEntry* EventAddLaserFocus(u32* handlerAmount);
-
+extern "C" BattleEventHandlerTableEntry* EventAddPollenPuff(u32* handlerAmount);
 extern "C" BattleEventHandlerTableEntry* EventAddPsychicTerrain(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddBurnUp(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddSpeedSwap(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddPurify(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddRevelationDance(u32* handlerAmount);
 
 extern "C" BattleEventHandlerTableEntry* EventAddPlasmaFist(u32* handlerAmount);
 
 extern "C" BattleEventHandlerTableEntry * EventAddCeaselessEdge(u32 * handlerAmount);
+
+extern "C" BattleEventHandlerTableEntry * EventAddDoubleShock(u32 * handlerAmount);
 
 extern "C" BattleEventHandlerTableEntry* EventAddRapidSpinUpdated(u32* handlerAmount);
 extern "C" BattleEventHandlerTableEntry* EventAddDefogUpdated(u32* handlerAmount);

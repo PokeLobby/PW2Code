@@ -86,6 +86,7 @@ To personalize the patch modify the ``settings.h`` file (I don't recomend modify
     - All new moves use the *Pound* animation
     - Most special secondary effects have not been implemented yet
     - You can check the ``NEW MOVES`` section in the ``BattleEngine.h`` file to see the currently implemented moves
+    - Pollen Puff allows you to select an ally affected by Heal Block
 
 ## How to Build
   - Download [PW2Builder](https://github.com/Paideieitor/PW2Builder/releases)

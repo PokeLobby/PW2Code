@@ -3886,3 +3886,6 @@ Symbols:
   - Name: Handler_GetBattleStyle
     Segment: 0xA7
     Address: 0x21abcdd
+  - Name: EventAddStoredPower
+    Segment: 0xA7
+    Address: 0x21cc8f5
