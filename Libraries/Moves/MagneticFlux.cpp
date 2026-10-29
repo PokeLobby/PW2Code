@@ -14,7 +14,10 @@ extern "C" void HandlerMagneticFlux(BattleEventItem* item, ServerFlow* serverFlo
             return;
         BattleMon* defendingMon = Handler_GetBattleMon(serverFlow, defendingSlot);
         ABILITY ability = BattleMon_GetValue(defendingMon, VALUE_ABILITY);
-        if (ability != ABIL_PLUS && ability != ABIL_MINUS) {
+        // Magnetic Flux / Gear Up use target "all" with the stat changes in MoveData,
+        // so only the user and its allies holding Plus or Minus keep the effect.
+        bool isUserSide = defendingSlot == pokemonSlot || MainModule_IsAllyMonID(pokemonSlot, defendingSlot);
+        if (!isUserSide || (ability != ABIL_PLUS && ability != ABIL_MINUS)) {
             BattleEventVar_RewriteValue(VAR_NO_EFFECT_FLAG, 1);
         }
     }
