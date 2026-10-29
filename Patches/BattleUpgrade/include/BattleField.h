@@ -98,6 +98,15 @@ struct BattleFieldExt
 
     // Extra type added by moves like Trick-or-Treat or Forest's Curse
     u8 extraTypes[BATTLE_MAX_SLOTS];
+
+    // Hack PokeLobby (lote 3). Resultado de la accion de ataque de cada Pokemon (Pataleta)
+    // - moveFailedNow: la accion en curso ha fallado (fallo, esquivada, bloqueada o sin efecto)
+    // - moveFailedPrev: resultado de la accion anterior del Pokemon (lo que mira Pataleta)
+    u8 moveFailedNow[BATTLE_MAX_SLOTS];
+    u8 moveFailedPrev[BATTLE_MAX_SLOTS];
+
+    // Coraza Trampa: 1 si el Pokemon con la trampa ha recibido un golpe fisico este turno
+    u8 shellTrapHit[BATTLE_MAX_SLOTS];
 #endif // EXPAND_MOVES
 };
 

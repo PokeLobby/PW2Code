@@ -172,6 +172,9 @@ extern "C" b32 SearchArray(const u32* const arr, const u32 arrSize, const u32 va
 // This code disregards the hardcoded instance of the data
 BattleFieldExt* g_BattleField;
 
+// Hack PokeLobby (lote 3): slot del Pokemon que esta ejecutando una accion de ataque (para Pataleta)
+static u32 g_ActionSlot = 31;
+
 #endif
 
 #if ADD_LEVEL_CAP || DISABLE_EVS
@@ -941,6 +944,13 @@ extern "C" int THUMB_BRANCH_ServerFlow_ActOrderProcMain(ServerFlow * serverFlow,
             BattleMon_GetHideCondition(currentActionOrder->battleMon) == CONDITIONFLAG_SHADOWFORCE);
         if (!isCommander) {
 #endif
+#if EXPAND_MOVES
+            // Pataleta: guarda el resultado de la accion anterior y empieza a medir la actual
+            if (BattleAction_GetAction(&currentActionOrder->action) == 1) {
+                g_ActionSlot = BattleMon_GetID(currentActionOrder->battleMon);
+                BattleField_BeginMoveAction(g_ActionSlot);
+            }
+#endif
             procAction = ActionOrder_Proc(serverFlow, currentActionOrder);
 #if EXPAND_ABILITIES
         }
@@ -1407,6 +1417,33 @@ extern "C" void BattleField_SetConsumedBerryFlag(u32 battleSlot) {
     g_BattleField->consumedBerryFlags |= (1 << battleSlot);
 }
 
+// Hack PokeLobby (lote 3): resultado de la ultima accion de ataque de cada Pokemon
+extern "C" b32 BattleField_GetMoveFailedPrev(u32 battleSlot) {
+    return g_BattleField->moveFailedPrev[battleSlot];
+}
+extern "C" void BattleField_SetMoveFailedNow(u32 battleSlot) {
+    if (g_BattleField && battleSlot < BATTLE_MAX_SLOTS)
+        g_BattleField->moveFailedNow[battleSlot] = 1;
+}
+extern "C" void BattleField_BeginMoveAction(u32 battleSlot) {
+    if (g_BattleField && battleSlot < BATTLE_MAX_SLOTS) {
+        g_BattleField->moveFailedPrev[battleSlot] = g_BattleField->moveFailedNow[battleSlot];
+        g_BattleField->moveFailedNow[battleSlot] = 0;
+    }
+}
+extern "C" void BattleField_ClearMoveFailed(u32 battleSlot) {
+    if (g_BattleField && battleSlot < BATTLE_MAX_SLOTS) {
+        g_BattleField->moveFailedPrev[battleSlot] = 0;
+        g_BattleField->moveFailedNow[battleSlot] = 0;
+    }
+}
+extern "C" b32 BattleField_GetShellTrapHit(u32 battleSlot) {
+    return g_BattleField->shellTrapHit[battleSlot];
+}
+extern "C" void BattleField_SetShellTrapHit(u32 battleSlot, u32 value) {
+    g_BattleField->shellTrapHit[battleSlot] = (u8)value;
+}
+
 extern "C" POKE_TYPE BattleField_GetExtraType(u32 battleSlot) {
     return g_BattleField->extraTypes[battleSlot];
 }
@@ -1794,6 +1831,9 @@ extern "C" void THUMB_BRANCH_BattleField_InitCore(BattleFieldExt * battleField, 
     battleField->consumedBerryFlags = 0;
 
     sys_memset(battleField->extraTypes, TYPE_NULL, BATTLE_MAX_SLOTS);
+    sys_memset(battleField->moveFailedNow, 0, BATTLE_MAX_SLOTS);
+    sys_memset(battleField->moveFailedPrev, 0, BATTLE_MAX_SLOTS);
+    sys_memset(battleField->shellTrapHit, 0, BATTLE_MAX_SLOTS);
 
 #endif 
 }
@@ -5012,6 +5052,12 @@ extern "C" void THUMB_BRANCH_SAFESTACK_flowsub_CheckNoEffect_Protect(ServerFlow 
             PokeSet_Remove(targetSet, targetMon);
         }
     }
+
+#if EXPAND_MOVES
+    // Pataleta: bloqueado por proteccion, inmune o sin efecto en todos los objetivos = accion fallida
+    if (PokeSet_GetCount(targetSet) == 0)
+        BattleField_SetMoveFailedNow(BattleMon_GetID(attackingMon));
+#endif
 }
 
 #endif // EXPAND_ABILITIES || GRASS_IMMUNE_TO_POWDER
@@ -5115,6 +5161,10 @@ extern "C" b32 AbilityDontChangeFormOnSwitchOut(ABILITY ability) {
     return SEARCH_ARRAY(abilityDontChangeFormOnSwitchOut, ability);
 }
 extern "C" void THUMB_BRANCH_BattleMon_ClearForSwitchOut(BattleMon* battleMon) {
+#if EXPAND_MOVES
+    BattleField_ClearMoveFailed(BattleMon_GetID(battleMon));
+    BattleField_SetShellTrapHit(BattleMon_GetID(battleMon), 0);
+#endif
     sys_memset(battleMon->turnFlag, 0, 2u);
     BattleMon_ClearTransformChange(battleMon);
     MoveWork_ClearSurface(battleMon);
@@ -5535,8 +5585,21 @@ extern "C" void THUMB_BRANCH_SAFESTACK_ServerFlow_CheckMoveAvoid(ServerFlow* ser
                 ServerEvent_AccuracyMiss(serverFlow, attackingMon);
             }
         }
+#if EXPAND_MOVES
+        // Pataleta: si el golpe ha fallado contra todos los objetivos, la accion cuenta como fallida
+        if (PokeSet_GetCount(targetSet) == 0)
+            BattleField_SetMoveFailedNow(BattleMon_GetID(attackingMon));
+#endif
     }
 }
+
+#if EXPAND_MOVES
+// Pataleta: "Pero ha fallado" cuenta como accion fallida (se reescribe la funcion original: anade el mensaje estandar 71)
+extern "C" void THUMB_BRANCH_ServerDisplay_MoveFail(ServerFlow* serverFlow) {
+    BattleField_SetMoveFailedNow(g_ActionSlot);
+    ServerDisplay_AddMessageImpl(serverFlow->serverCommandQueue, SCID_MessageStandard, 71, 0xFFFF0000);
+}
+#endif
 
 // Utility Umbrella - Disable weather related abilities and moves on the holder
 extern "C" WEATHER THUMB_BRANCH_LINK_HandlerChlorophyll_0x14(ServerFlow * serverFlow) {
@@ -5919,6 +5982,25 @@ MoveEventAddTableExt moveEventAddTableExt[] = {
     {MOVE_STICKY_WEB, EventAddStickyWeb, "Moves/StickyWeb"},
     {MOVE_FELL_STINGER, EventAddFellStinger, "Moves/FellStinger"},
     {MOVE_PHANTOM_FORCE, EventAddShadowForce, nullptr},
+    // Hack PokeLobby (lote 3)
+    {MOVE_HYPERSPACE_HOLE, EventAddHyperspaceHole, "Moves/HyperspaceFury"},
+    {MOVE_PSYCHIC_FANGS, EventAddBrickBreak, nullptr},
+    {MOVE_STOMPING_TANTRUM, EventAddStompingTantrum, "Moves/StompingTantrum"},
+    {MOVE_ANCHOR_SHOT, EventAddTrapHit, "Moves/TrapHit"},
+    {MOVE_POWER_TRIP, EventAddStoredPower, nullptr},
+    {MOVE_BURN_UP, EventAddBurnUp, "Moves/RemoveType"},
+    {MOVE_REVELATION_DANCE, EventAddRevelationDance, "Moves/RevelationDance"},
+    {MOVE_BEAK_BLAST, EventAddBeakBlast, "Moves/BeakBlast"},
+    {MOVE_SHELL_TRAP, EventAddShellTrap, "Moves/ShellTrap"},
+    {MOVE_SPECTRAL_THIEF, EventAddSpectralThief, "Moves/SpectralThief"},
+    {MOVE_SUNSTEEL_STRIKE, EventAddMoldBreakerMove, "Moves/MoldBreakerMove"},
+    {MOVE_MOONGEIST_BEAM, EventAddMoldBreakerMove, "Moves/MoldBreakerMove"},
+    {MOVE_NATURES_MADNESS, EventAddSuperFang, nullptr},
+    {MOVE_MIND_BLOWN, EventAddMindBlown, "Moves/MindBlown"},
+    {MOVE_PHOTON_GEYSER, EventAddPhotonGeyser, "Moves/MoldBreakerMove"},
+    {MOVE_JAW_LOCK, EventAddJawLock, "Moves/TrapHit"},
+    {MOVE_STEEL_ROLLER, EventAddSteelRoller, "Moves/SteelRoller"},
+    {MOVE_FLIP_TURN, EventAddUTurn, nullptr},
     {MOVE_TRICK_OR_TREAT, EventAddTrickOrTreat, "Moves/ExtraType"},
     {MOVE_ION_DELUGE, EventAddIonDeluge, "Moves/IonDeluge"},
     {MOVE_FOREST_S_CURSE, EventAddForestsCurse, "Moves/ExtraType"},
@@ -5941,12 +6023,12 @@ MoveEventAddTableExt moveEventAddTableExt[] = {
     {MOVE_HOLD_BACK, EventAddFalseSwipe, nullptr},
     {MOVE_INFESTATION, EventAddBind, nullptr},
     {MOVE_THOUSAND_ARROWS, EventAddThousandArrows, "Moves/ThousandArrows"},
-    {MOVE_THOUSAND_WAVES, EventAddSpiderWeb, nullptr},
+    {MOVE_THOUSAND_WAVES, EventAddTrapHit, "Moves/TrapHit"},
     {MOVE_HYPERSPACE_FURY, EventAddHyperspaceFury, "Moves/HyperspaceFury"},
     {MOVE_SHORE_UP, EventAddShoreUp, "Moves/ShoreUp"},
     {MOVE_FIRST_IMPRESSION, EventAddFakeOut, nullptr},
     {MOVE_BANEFUL_BUNKER, EventAddBanefulBunker, "Moves/BanefulBunker"},
-    {MOVE_SPIRIT_SHACKLE, EventAddSpiderWeb, nullptr},
+    {MOVE_SPIRIT_SHACKLE, EventAddTrapHit, "Moves/TrapHit"},
     {MOVE_DARKEST_LARIAT, EventAddChipAway, nullptr},
     {MOVE_SPARKLING_ARIA, EventAddSparklingAria, "Moves/SparklingAria"},
     {MOVE_FLORAL_HEALING, EventAddFloralHealing, "Moves/FloralHealing"},
@@ -5998,6 +6080,8 @@ PosEffectEventAddTableExt posEffectEventAddTableExt[] = {
     {POSEFF_SYRUP_BOMB, EventAddPosSyrupBomb, "Moves/SyrupBomb"},
     {POSEFF_TAR_SHOT, EventAddPosTarShot, "Moves/TarShot"},
     {POSEFF_SHED_TAIL, EventAddPosShedTail, "Moves/ShedTail"},
+    {POSEFF_BEAK_BLAST, EventAddPosBeakBlast, "Moves/BeakBlast"},
+    {POSEFF_SHELL_TRAP, EventAddPosShellTrap, "Moves/ShellTrap"},
 };
 
 extern "C" void CMD_ACT_MoveAnimStart(BtlvScu * btlvScu, u32 attckViewPos, u32 defViewPos, u16 moveID, u32 moveTarget, u8 effectIndex, u8 zero);

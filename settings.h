@@ -181,6 +181,9 @@
 #define BATTLE_TAR_SHOT_START_MSGID 1295
 #define BATTLE_THROAT_CHOP_FAIL_MSGID 1298
 #define BATTLE_SHED_TAIL_MSGID 1301
+// Hack PokeLobby (lote 3)
+#define BATTLE_BEAK_BLAST_MSGID 1304
+#define BATTLE_SHELL_TRAP_MSGID 1307
 #define BATTLE_REVIVED_MSGID 3 // mensaje original del juego: Pokemon revivido
 
 // SCRIPTS

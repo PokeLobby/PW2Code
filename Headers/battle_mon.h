@@ -107,8 +107,7 @@ struct SWAN_ALIGNED(4) BattleMon
     u16 specialAttack;
     u16 specialDefense;
     u16 speed;
-    u8 Type1;
-    u8 Type2;
+    u8 type[2];
     u8 Sex;
     u8 field_FB;
     StatStageParam statStageParam;

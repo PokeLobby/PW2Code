@@ -47,6 +47,27 @@ extern "C" BattleEventHandlerTableEntry* EventAddShedTail(u32* handlerAmount);
 extern "C" BattleEventHandlerTableEntry* EventAddSnowscape(u32* handlerAmount);
 extern "C" BattleEventHandlerTableEntry* EventAddSyrupBomb(u32* handlerAmount);
 
+// Hack PokeLobby (lote 3)
+extern "C" BattleEventHandlerTableEntry* EventAddBurnUp(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddRevelationDance(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddHyperspaceHole(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddTrapHit(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddJawLock(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddStompingTantrum(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddMoldBreakerMove(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddPhotonGeyser(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddMindBlown(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddBeakBlast(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddShellTrap(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddSpectralThief(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddSteelRoller(u32* handlerAmount);
+extern "C" b32 BattleField_GetMoveFailedPrev(u32 battleSlot);
+extern "C" void BattleField_SetMoveFailedNow(u32 battleSlot);
+extern "C" void BattleField_BeginMoveAction(u32 battleSlot);
+extern "C" void BattleField_ClearMoveFailed(u32 battleSlot);
+extern "C" b32 BattleField_GetShellTrapHit(u32 battleSlot);
+extern "C" void BattleField_SetShellTrapHit(u32 battleSlot, u32 value);
+
 extern "C" BattleEventHandlerTableEntry* EventAddPsychicTerrain(u32* handlerAmount);
 
 extern "C" BattleEventHandlerTableEntry* EventAddPlasmaFist(u32* handlerAmount);
@@ -69,6 +90,8 @@ extern "C" BattleEventHandlerTableEntry* EventAddPosSaltCure(u32* handlerAmount)
 extern "C" BattleEventHandlerTableEntry* EventAddPosSyrupBomb(u32* handlerAmount);
 extern "C" BattleEventHandlerTableEntry* EventAddPosTarShot(u32* handlerAmount);
 extern "C" BattleEventHandlerTableEntry* EventAddPosShedTail(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddPosBeakBlast(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddPosShellTrap(u32* handlerAmount);
 
 extern "C" void GetSideBattleSlots(ServerFlow * serverFlow, u32 side, u8 battleSlots[3]);
 extern "C" u32 PosEffect_SetPriority(BattleEventPriority priority, u32 handlerCount);

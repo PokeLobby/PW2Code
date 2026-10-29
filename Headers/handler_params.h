@@ -153,7 +153,7 @@ struct SWAN_ALIGNED(4) HandlerParam_ChangeType
     HandlerParam_Header header;
     u16 pokeType;
     u8 pokeID;
-    u8 field_7;
+    u8 skipText;
 };
 
 struct HandlerParam_SwapItem

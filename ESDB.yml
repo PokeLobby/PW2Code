@@ -3892,3 +3892,15 @@ Symbols:
   - Name: BattleMon_CreateSubstitute
     Segment: 0xA7
     Address: 0x21bc59d
+  - Name: EventAddBrickBreak
+    Segment: 0xA7
+    Address: 0x21c607d
+  - Name: EventAddSuperFang
+    Segment: 0xA7
+    Address: 0x21c6ce5
+  - Name: EventAddUTurn
+    Segment: 0xA7
+    Address: 0x21cb1e1
+  - Name: EventAddStoredPower
+    Segment: 0xA7
+    Address: 0x21cc8f5

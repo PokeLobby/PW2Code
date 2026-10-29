@@ -32,4 +32,15 @@ extern "C" BattleEventHandlerTableEntry* EventAddHyperspaceFury(u32* handlerAmou
     return HyperspaceFuryHandlers;
 }
 
+// HYPERSPACE HOLE (593, Hack PokeLobby lote 3): same protection breaking as Hyperspace Fury, without the Hoopa check
+BattleEventHandlerTableEntry HyperspaceHoleHandlers[] {
+    {EVENT_CHECK_PROTECT_BREAK, HandlerFeintBreakProtect},
+    {EVENT_DETERMINE_MOVE_DAMAGE, HandlerFeintTextSet},
+    {EVENT_BREAK_OPPONENT_GUARD, HandlerFeintResetProtectCounter},
+};
+extern "C" BattleEventHandlerTableEntry* EventAddHyperspaceHole(u32* handlerAmount) {
+    *handlerAmount = ARRAY_COUNT(HyperspaceHoleHandlers);
+    return HyperspaceHoleHandlers;
+}
+
 #endif // EXPAND_MOVES
