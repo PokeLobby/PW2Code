@@ -12,7 +12,7 @@ extern "C" void HandlerToughClaws(BattleEventItem * item, ServerFlow * serverFlo
         u32 attackingSlot = BattleEventVar_GetValue(VAR_ATTACKING_MON);
         u32 defendingSlot = BattleEventVar_GetValue(VAR_DEFENDING_MON);
         if (MakesContact(serverFlow, moveID, attackingSlot, defendingSlot)) {
-            BattleEventVar_MulValue(VAR_MOVE_POWER_RATIO, 5461);
+            BattleEventVar_MulValue(VAR_MOVE_POWER_RATIO, 5325);
         }
     }
 }
