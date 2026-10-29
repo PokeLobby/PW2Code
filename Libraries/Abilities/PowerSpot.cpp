@@ -9,7 +9,7 @@ extern "C" void HandlerPowerSpot(BattleEventItem * item, ServerFlow * serverFlow
     if (pokemonSlot != attackingSlot &&
         MainModule_IsAllyMonID(pokemonSlot, attackingSlot)) {
 
-        BattleEventVar_MulValue(VAR_MOVE_POWER_RATIO, 5461);
+        BattleEventVar_MulValue(VAR_MOVE_POWER_RATIO, 5325);
     }
 }
 BattleEventHandlerTableEntry PowerSpotHandlers[]{
