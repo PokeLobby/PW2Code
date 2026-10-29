@@ -12,7 +12,11 @@ extern "C" void HandlerBallFetch(BattleEventItem * item, ServerFlow * serverFlow
         // Has no item
         if (BattleMon_GetHeldItem(currentMon) == ITEM_NULL) {
             ActionOrderWork* actionOrderWork = serverFlow->actionOrderWork;
-            for (u8 i = 0; i < 6; ++i) {
+            // Only the actions of this turn count (the rest of the array keeps old data); take the first ball only
+            u8 actionCount = serverFlow->numActOrder;
+            if (actionCount == 0 || actionCount > 6)
+                actionCount = 6;
+            for (u8 i = 0; i < actionCount; ++i) {
                 u32 action = BattleAction_GetAction(&actionOrderWork[i].action);
                 // Action is an item used by the player
                 if (action == 2) {
@@ -20,7 +24,7 @@ extern "C" void HandlerBallFetch(BattleEventItem * item, ServerFlow * serverFlow
                     BattleAction_Item* itemAction = (BattleAction_Item*)&actionOrderWork[i].action;
                     ITEM itemID = itemAction->itemID;
                     // Item is a PokéBall
-                    if (ItemGetParam(itemID, ITSTAT_CLASS) == 4) {
+                    if (itemID != ITEM_NULL && ItemGetParam(itemID, ITSTAT_CLASS) == 4) {
                         HandlerParam_SetItem* setItem;
                         setItem = (HandlerParam_SetItem*)BattleHandler_PushWork(serverFlow, EFFECT_SET_HELD_ITEM, pokemonSlot);
                         setItem->header.flags |= HANDLER_ABILITY_POPUP_FLAG;
@@ -31,6 +35,7 @@ extern "C" void HandlerBallFetch(BattleEventItem * item, ServerFlow * serverFlow
                         BattleHandler_AddArg(&setItem->exStr, pokemonSlot);
                         BattleHandler_AddArg(&setItem->exStr, itemID);
                         BattleHandler_PopWork(serverFlow, setItem);
+                        break;
                     }
                 }
             }
