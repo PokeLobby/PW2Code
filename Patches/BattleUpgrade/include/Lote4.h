@@ -16,8 +16,10 @@ struct Lote4State {
     u8 timesHit[LOTE4_SLOTS];
     // 1 si el Pokemon ya ha usado Sin Retirada desde que entro en combate
     u8 noRetreat[LOTE4_SLOTS];
-    // 1 si ya se ha usado Hora Feliz en este combate
+    // bit 0: Hora Feliz usada por el jugador; bit 1: por el rival
     u8 happyHour;
+    // 1 mientras el Pokemon esta bajo Asalto Espadon (recibe doble dano hasta que vuelva a actuar)
+    u8 glaiveRush[LOTE4_SLOTS];
     u8 pad[2];
 };
 

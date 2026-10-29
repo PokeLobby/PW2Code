@@ -120,6 +120,20 @@ extern "C" BattleEventHandlerTableEntry* EventAddLastRespects(u32* handlerAmount
 extern "C" BattleEventHandlerTableEntry* EventAddRageFist(u32* handlerAmount);
 extern "C" BattleEventHandlerTableEntry* EventAddHardPress(u32* handlerAmount);
 extern "C" BattleEventHandlerTableEntry* EventAddSplinteredStormshards(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddTripleAxel(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddPopulationBomb(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddAlwaysCrit(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddStoneAxe(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddGlaiveRush(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddPsyblade(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddSuperEffectiveBoost(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddNotTwice(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddElectroShot(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddFickleBeam(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddUpperHand(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddGravApple(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddShellSideArm(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddDoubleShock(u32* handlerAmount);
 
 extern "C" BattleEventHandlerTableEntry* EventAddPsychicTerrain(u32* handlerAmount);
 

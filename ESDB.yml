@@ -3919,3 +3919,18 @@ Symbols:
   - Name: EventAddProtect
     Segment: 0xA7
     Address: 0x21c9381
+  - Name: EventAddTripleKick
+    Segment: 0xA7
+    Address: 0x21c7fd5
+  - Name: EventAddVenoshock
+    Segment: 0xA7
+    Address: 0x21cc83d
+  - Name: EventAddMetalBurst
+    Segment: 0xA7
+    Address: 0x21c722d
+  - Name: EventAddSuckerPunch
+    Segment: 0xA7
+    Address: 0x21c74f9
+  - Name: EventAddOutrage
+    Segment: 0xA7
+    Address: 0x21c7a61

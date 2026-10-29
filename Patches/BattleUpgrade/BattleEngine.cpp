@@ -1438,6 +1438,7 @@ extern "C" void BattleField_BeginMoveAction(u32 battleSlot) {
     if (g_BattleField && battleSlot < BATTLE_MAX_SLOTS) {
         g_BattleField->moveFailedPrev[battleSlot] = g_BattleField->moveFailedNow[battleSlot];
         g_BattleField->moveFailedNow[battleSlot] = 0;
+        g_BattleField->lote4.glaiveRush[battleSlot] = 0;
     }
 }
 extern "C" void BattleField_ClearMoveFailed(u32 battleSlot) {
@@ -3138,6 +3139,11 @@ extern "C" u32 THUMB_BRANCH_SAFESTACK_ServerEvent_CalcDamage(ServerFlow * server
         int damageAfterProc2 = BattleEventVar_GetValue(VAR_DAMAGE);
         finalDamage = fixed_round(damageAfterProc2, damageRatio);
     }
+#if EXPAND_MOVES
+    // Hack PokeLobby (lote 4): Asalto Espadon, el usuario recibe el doble de dano
+    if (g_BattleField && defendingSlot < BATTLE_MAX_SLOTS && g_BattleField->lote4.glaiveRush[defendingSlot] && !isFixedDamage)
+        finalDamage *= 2;
+#endif
     BattleEvent_CallHandlers(serverFlow, EVENT_MOVE_DAMAGE_PROCESSING_END);
     BattleEventVar_Pop();
     *destDamage = (u16)finalDamage;
@@ -5224,6 +5230,7 @@ extern "C" void THUMB_BRANCH_BattleMon_ClearForSwitchOut(BattleMon* battleMon) {
     BattleField_ClearMoveFailed(BattleMon_GetID(battleMon));
     BattleField_SetShellTrapHit(BattleMon_GetID(battleMon), 0);
     GetLote4State()->noRetreat[BattleMon_GetID(battleMon)] = 0;
+    GetLote4State()->glaiveRush[BattleMon_GetID(battleMon)] = 0;
 #endif
     sys_memset(battleMon->turnFlag, 0, 2u);
     BattleMon_ClearTransformChange(battleMon);
@@ -5915,6 +5922,18 @@ extern "C" b32 THUMB_BRANCH_SAFESTACK_IsUnselectableMove(BtlClientWk* client, Ba
             return 1;
         }
 
+#if EXPAND_MOVES
+        // Hack PokeLobby (lote 4): Martillo Colosal y Luna Roja no se pueden usar dos veces seguidas
+        if ((moveID == MOVE_GIGATON_HAMMER || moveID == MOVE_BLOOD_MOON) && moveID == BattleMon_GetPreviousMove(battleMon)) {
+            if (strparam) {
+                Btlv_StringParam_Setup(strparam, 2, BATTLE_NOT_TWICE_MSGID);
+                u32 battleSlot = BattleMon_GetID(battleMon);
+                Btlv_StringParam_AddArg(strparam, battleSlot);
+                Btlv_StringParam_AddArg(strparam, moveID);
+            }
+            return 1;
+        }
+#endif
         if (BattleField_CheckEffect(FLDEFF_IMPRISON) && 
             BattleField_CheckImprison(client->pokeCon, battleMon, moveID)) {
             if (strparam) {
@@ -6136,6 +6155,63 @@ MoveEventAddTableExt moveEventAddTableExt[] = {
     {MOVE_BURNING_JEALOUSY, EventAddBurningJealousy, "Moves/DamageMoves"},
     {MOVE_ALLURING_VOICE, EventAddAlluringVoice, "Moves/DamageMoves"},
     {MOVE_MAX_GUARD, EventAddProtect, nullptr},
+    // Lote 4b
+    {MOVE_CORE_ENFORCER, EventAddCoreEnforcer, "Moves/DamageMoves"},
+    {MOVE_GUARDIAN_OF_ALOLA, EventAddGuardianOfAlola, "Moves/DamageMoves"},
+    {MOVE_GENESIS_SUPERNOVA, EventAddGenesisSupernova, "Moves/DamageMoves"},
+    {MOVE_BOLT_BEAK, EventAddBoltBeak, "Moves/DamageMoves"},
+    {MOVE_FISHIOUS_REND, EventAddBoltBeak, "Moves/DamageMoves"},
+    {MOVE_METEOR_BEAM, EventAddMeteorBeam, "Moves/DamageMoves"},
+    {MOVE_MISTY_EXPLOSION, EventAddMistyExplosion, "Moves/DamageMoves"},
+    {MOVE_EXPANDING_FORCE, EventAddExpandingForce, "Moves/DamageMoves"},
+    {MOVE_RISING_VOLTAGE, EventAddRisingVoltage, "Moves/DamageMoves"},
+    {MOVE_TERRAIN_PULSE, EventAddTerrainPulse, "Moves/DamageMoves"},
+    {MOVE_LASH_OUT, EventAddLashOut, "Moves/DamageMoves"},
+    {MOVE_POLTERGEIST, EventAddPoltergeist, "Moves/DamageMoves"},
+    {MOVE_EERIE_SPELL, EventAddEerieSpell, "Moves/DamageMoves"},
+    {MOVE_TERA_BLAST, EventAddTeraBlast, "Moves/DamageMoves"},
+    {MOVE_LAST_RESPECTS, EventAddLastRespects, "Moves/DamageMoves"},
+    {MOVE_RAGE_FIST, EventAddRageFist, "Moves/DamageMoves"},
+    {MOVE_HARD_PRESS, EventAddHardPress, "Moves/DamageMoves"},
+    {MOVE_SPLINTERED_STORMSHARDS, EventAddSplinteredStormshards, "Moves/SteelRoller"},
+    // Alias a funciones del juego o de lotes anteriores
+    {MOVE_LIGHT_THAT_BURNS_THE_SKY, EventAddPhotonGeyser, "Moves/MoldBreakerMove"},
+    {MOVE_SEARING_SUNRAZE_SMASH, EventAddMoldBreakerMove, "Moves/MoldBreakerMove"},
+    {MOVE_MENACING_MOONRAZE_MAELSTROM, EventAddMoldBreakerMove, "Moves/MoldBreakerMove"},
+    {MOVE_PIKA_PAPOW, EventAddReturn, nullptr},
+    {MOVE_VEEVEE_VOLLEY, EventAddReturn, nullptr},
+    {MOVE_STEEL_BEAM, EventAddMindBlown, "Moves/MindBlown"},
+    {MOVE_CHLOROBLAST, EventAddMindBlown, "Moves/MindBlown"},
+    {MOVE_DRAGON_ENERGY, EventAddEruption, nullptr},
+    {MOVE_TEMPER_FLARE, EventAddStompingTantrum, "Moves/StompingTantrum"},
+    {MOVE_SUPERCELL_SLAM, EventAddHiJumpKick, nullptr},
+    // Lote 4b (C con reglas propias)
+    {MOVE_TRIPLE_AXEL, EventAddTripleAxel, "Moves/ExtraMoves"},
+    {MOVE_POPULATION_BOMB, EventAddPopulationBomb, "Moves/ExtraMoves"},
+    {MOVE_WICKED_BLOW, EventAddAlwaysCrit, "Moves/ExtraMoves"},
+    {MOVE_SURGING_STRIKES, EventAddAlwaysCrit, "Moves/ExtraMoves"},
+    {MOVE_FLOWER_TRICK, EventAddAlwaysCrit, "Moves/ExtraMoves"},
+    {MOVE_STONE_AXE, EventAddStoneAxe, "Moves/ExtraMoves"},
+    {MOVE_GLAIVE_RUSH, EventAddGlaiveRush, "Moves/ExtraMoves"},
+    {MOVE_PSYBLADE, EventAddPsyblade, "Moves/ExtraMoves"},
+    {MOVE_COLLISION_COURSE, EventAddSuperEffectiveBoost, "Moves/ExtraMoves"},
+    {MOVE_ELECTRO_DRIFT, EventAddSuperEffectiveBoost, "Moves/ExtraMoves"},
+    {MOVE_GIGATON_HAMMER, EventAddNotTwice, "Moves/ExtraMoves"},
+    {MOVE_BLOOD_MOON, EventAddNotTwice, "Moves/ExtraMoves"},
+    {MOVE_ELECTRO_SHOT, EventAddElectroShot, "Moves/ExtraMoves"},
+    {MOVE_FICKLE_BEAM, EventAddFickleBeam, "Moves/ExtraMoves"},
+    {MOVE_UPPER_HAND, EventAddUpperHand, "Moves/ExtraMoves"},
+    {MOVE_GRAV_APPLE, EventAddGravApple, "Moves/ExtraMoves"},
+    {MOVE_SHELL_SIDE_ARM, EventAddShellSideArm, "Moves/ExtraMoves"},
+    {MOVE_DOUBLE_SHOCK, EventAddDoubleShock, "Moves/RemoveType"},
+    {MOVE_ICE_SPINNER, EventAddSplinteredStormshards, "Moves/SteelRoller"},
+    {MOVE_RAGING_FURY, EventAddOutrage, nullptr},
+    {MOVE_BARB_BARRAGE, EventAddVenoshock, nullptr},
+    {MOVE_MORTAL_SPIN, EventAddRapidSpinUpdated, "Moves/RapidSpin"},
+    {MOVE_RAGING_BULL, EventAddBrickBreak, nullptr},
+    {MOVE_RUINATION, EventAddSuperFang, nullptr},
+    {MOVE_COMEUPPANCE, EventAddMetalBurst, nullptr},
+    {MOVE_THUNDERCLAP, EventAddSuckerPunch, nullptr},
 
 
     {MOVE_PSYCHIC_TERRAIN, EventAddPsychicTerrain, "Moves/PsychicTerrain"},

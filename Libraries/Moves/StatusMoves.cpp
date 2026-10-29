@@ -103,27 +103,31 @@ extern "C" BattleEventHandlerTableEntry* EventAddDoodle(u32* handlerAmount) {
 // ---------------- CORROSIVE GAS (810)
 extern "C" void HandlerCorrosiveGas(BattleEventItem* item, ServerFlow* serverFlow, u32 pokemonSlot, u32* work) {
     if (pokemonSlot == BattleEventVar_GetValue(VAR_ATTACKING_MON)) {
-        u32 targetSlot = BattleEventVar_GetValue(VAR_TARGET_MON_ID);
-        if (targetSlot == BATTLE_MAX_SLOTS)
-            return;
-        BattleMon* targetMon = Handler_GetBattleMon(serverFlow, targetSlot);
-        if (BattleMon_IsFainted(targetMon))
-            return;
-        // Mismas comprobaciones que Desarme: Viscosidad, objetos que no se pueden quitar...
-        if (HandlerCommon_CheckIfCanStealPokeItem(serverFlow, pokemonSlot, targetSlot))
-            return;
-        ITEM heldItem = BattleMon_GetHeldItem(targetMon);
-        if (!heldItem)
-            return;
+        // El evento se llama una sola vez con la lista de objetivos
+        u32 targetCount = BattleEventVar_GetValue(VAR_TARGET_COUNT);
+        for (u32 targetIdx = 0; targetIdx < targetCount; ++targetIdx) {
+            u32 targetSlot = BattleEventVar_GetValue((BattleEventVar)(VAR_TARGET_MON_ID + targetIdx));
+            if (targetSlot == BATTLE_MAX_SLOTS)
+                continue;
+            BattleMon* targetMon = Handler_GetBattleMon(serverFlow, targetSlot);
+            if (BattleMon_IsFainted(targetMon))
+                continue;
+            // Mismas comprobaciones que Desarme: Viscosidad, objetos que no se pueden quitar...
+            if (HandlerCommon_CheckIfCanStealPokeItem(serverFlow, pokemonSlot, targetSlot))
+                continue;
+            ITEM heldItem = BattleMon_GetHeldItem(targetMon);
+            if (!heldItem)
+                continue;
 
-        HandlerParam_SetItem* setItem;
-        setItem = (HandlerParam_SetItem*)BattleHandler_PushWork(serverFlow, EFFECT_SET_HELD_ITEM, pokemonSlot);
-        setItem->pokeID = (u8)targetSlot;
-        setItem->itemID = 0;
-        BattleHandler_StrSetup(&setItem->exStr, 2u, BATTLE_CORROSIVE_GAS_MSGID);
-        BattleHandler_AddArg(&setItem->exStr, targetSlot);
-        BattleHandler_AddArg(&setItem->exStr, heldItem);
-        BattleHandler_PopWork(serverFlow, setItem);
+            HandlerParam_SetItem* setItem;
+            setItem = (HandlerParam_SetItem*)BattleHandler_PushWork(serverFlow, EFFECT_SET_HELD_ITEM, pokemonSlot);
+            setItem->pokeID = (u8)targetSlot;
+            setItem->itemID = 0;
+            BattleHandler_StrSetup(&setItem->exStr, 2u, BATTLE_CORROSIVE_GAS_MSGID);
+            BattleHandler_AddArg(&setItem->exStr, targetSlot);
+            BattleHandler_AddArg(&setItem->exStr, heldItem);
+            BattleHandler_PopWork(serverFlow, setItem);
+        }
     }
 }
 BattleEventHandlerTableEntry CorrosiveGasHandlers[]{

@@ -10,7 +10,7 @@
 // REMOVE TYPE
 // work[0] -> stores the type to become
 // work[1] -> flag to remove extra type
-void HandlerRemoveTypeCheck(ServerFlow *serverFlow, u32 pokemonSlot, PokeType type, u32* work) {
+void HandlerRemoveTypeCheck(ServerFlow *serverFlow, u32 pokemonSlot, PokeType type, u32* work, u32 msgID) {
     if (pokemonSlot == BattleEventVar_GetValue(VAR_MON_ID)) {
         BattleMon* currentMon = Handler_GetBattleMon(serverFlow, pokemonSlot);
         if (!BattleMon_HasType(currentMon, type)) {
@@ -20,6 +20,7 @@ void HandlerRemoveTypeCheck(ServerFlow *serverFlow, u32 pokemonSlot, PokeType ty
 
         work[0] = TYPE_NULL;
         work[1] = 0;
+        work[2] = msgID;
 
         if (BattleField_GetExtraType(pokemonSlot) == type) {
             work[1] = 1;
@@ -45,7 +46,7 @@ extern "C" void HandlerRemoveType(BattleEventItem* item, ServerFlow* serverFlow,
         }
 
         HandlerParam_Message* message = (HandlerParam_Message*)BattleHandler_PushWork(serverFlow, EFFECT_MESSAGE, pokemonSlot);
-        BattleHandler_StrSetup(&message->str, 2, BATTLE_BURN_UP_MSGID);
+        BattleHandler_StrSetup(&message->str, 2, work[2]);
         BattleHandler_AddArg(&message->str, pokemonSlot);
         BattleHandler_PopWork(serverFlow, message);
     }
@@ -53,7 +54,7 @@ extern "C" void HandlerRemoveType(BattleEventItem* item, ServerFlow* serverFlow,
 
 // BURN UP
 extern "C" void HandlerBurnUpCheck(BattleEventItem* item, ServerFlow* serverFlow, u32 pokemonSlot, u32* work) {
-    HandlerRemoveTypeCheck(serverFlow, pokemonSlot, TYPE_FIRE, work);
+    HandlerRemoveTypeCheck(serverFlow, pokemonSlot, TYPE_FIRE, work, BATTLE_BURN_UP_MSGID);
 }
 BattleEventHandlerTableEntry BurnUpHandlers[]{
     {EVENT_MOVE_EXECUTE_CHECK2, HandlerBurnUpCheck},
@@ -66,7 +67,7 @@ extern "C" BattleEventHandlerTableEntry* EventAddBurnUp(u32* handlerAmount) {
 
 // DOUBLE SHOCK
 extern "C" void HandlerDoubleShockCheck(BattleEventItem* item, ServerFlow* serverFlow, u32 pokemonSlot, u32* work) {
-    HandlerRemoveTypeCheck(serverFlow, pokemonSlot, TYPE_ELEC, work);
+    HandlerRemoveTypeCheck(serverFlow, pokemonSlot, TYPE_ELEC, work, BATTLE_DOUBLE_SHOCK_MSGID);
 }
 BattleEventHandlerTableEntry DoubleShockHandlers[]{
     {EVENT_MOVE_EXECUTE_CHECK2, HandlerDoubleShockCheck},
