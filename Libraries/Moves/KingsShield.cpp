@@ -24,7 +24,7 @@ extern "C" void HandlerPosKingsShield(BattleEventItem* item, ServerFlow* serverF
             statChange = (HandlerParam_ChangeStatStage*)BattleHandler_PushWork(serverFlow, EFFECT_CHANGE_STAT_STAGE, defendingSlot);
             statChange->pokeCount = 1;
             statChange->pokeID[0] = attackingSlot;
-            statChange->stat = STATSTAGE_DEFENSE;
+            statChange->stat = STATSTAGE_ATTACK;
 #if !GEN6_KINGS_SHIELD
             statChange->volume = -1;
 #else
