@@ -6203,6 +6203,7 @@ MoveEventAddTableExt moveEventAddTableExt[] = {
     {MOVE_UPPER_HAND, EventAddUpperHand, "Moves/ExtraMoves"},
     {MOVE_GRAV_APPLE, EventAddGravApple, "Moves/ExtraMoves"},
     {MOVE_SHELL_SIDE_ARM, EventAddShellSideArm, "Moves/ExtraMoves"},
+    {MOVE_TAKE_HEART, EventAddTakeHeart, "Moves/ExtraMoves"},
     {MOVE_DOUBLE_SHOCK, EventAddDoubleShock, "Moves/RemoveType"},
     {MOVE_ICE_SPINNER, EventAddSplinteredStormshards, "Moves/SteelRoller"},
     {MOVE_RAGING_FURY, EventAddOutrage, nullptr},

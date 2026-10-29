@@ -133,6 +133,7 @@ extern "C" BattleEventHandlerTableEntry* EventAddFickleBeam(u32* handlerAmount);
 extern "C" BattleEventHandlerTableEntry* EventAddUpperHand(u32* handlerAmount);
 extern "C" BattleEventHandlerTableEntry* EventAddGravApple(u32* handlerAmount);
 extern "C" BattleEventHandlerTableEntry* EventAddShellSideArm(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddTakeHeart(u32* handlerAmount);
 extern "C" BattleEventHandlerTableEntry* EventAddDoubleShock(u32* handlerAmount);
 
 extern "C" BattleEventHandlerTableEntry* EventAddPsychicTerrain(u32* handlerAmount);

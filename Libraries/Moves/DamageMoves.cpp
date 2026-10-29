@@ -256,18 +256,18 @@ extern "C" void HandlerMistyExplosionPower(BattleEventItem* item, ServerFlow* se
         MulPower(3, 2);
     }
 }
-BattleEventHandlerTableEntry MistyExplosionHandlers[8];
+// Las tres primeras entradas son las de Explosion del juego (sus manejadores estan en ESDB.yml)
+extern "C" void HandlerExplosionDamage(BattleEventItem* item, ServerFlow* serverFlow, u32 pokemonSlot, u32* work);
+extern "C" void HandlerExplosionStart(BattleEventItem* item, ServerFlow* serverFlow, u32 pokemonSlot, u32* work);
+extern "C" void HandlerExplosionEnd(BattleEventItem* item, ServerFlow* serverFlow, u32 pokemonSlot, u32* work);
+BattleEventHandlerTableEntry MistyExplosionHandlers[]{
+    {EVENT_DETERMINE_MOVE_DAMAGE, HandlerExplosionDamage},
+    {EVENT_MOVE_EXECUTE_START, HandlerExplosionStart},
+    {EVENT_MOVE_EXECUTE_END, HandlerExplosionEnd},
+    {EVENT_MOVE_BASE_POWER, HandlerMistyExplosionPower},
+};
 extern "C" BattleEventHandlerTableEntry* EventAddMistyExplosion(u32* handlerAmount) {
-    // Se copian las entradas de Explosion del juego y se anade la de potencia
-    u32 baseAmount = 0;
-    BattleEventHandlerTableEntry* base = EventAddExplosion(&baseAmount);
-    if (baseAmount > 7)
-        baseAmount = 7;
-    for (u32 i = 0; i < baseAmount; ++i)
-        MistyExplosionHandlers[i] = base[i];
-    MistyExplosionHandlers[baseAmount].eventType = EVENT_MOVE_BASE_POWER;
-    MistyExplosionHandlers[baseAmount].handler = HandlerMistyExplosionPower;
-    *handlerAmount = baseAmount + 1;
+    *handlerAmount = ARRAY_COUNT(MistyExplosionHandlers);
     return MistyExplosionHandlers;
 }
 

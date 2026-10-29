@@ -3934,3 +3934,15 @@ Symbols:
   - Name: EventAddOutrage
     Segment: 0xA7
     Address: 0x21c7a61
+  - Name: HandlerExplosionDamage
+    Segment: 0xA7
+    Address: 0x21c7645
+  - Name: HandlerExplosionStart
+    Segment: 0xA7
+    Address: 0x21c766d
+  - Name: HandlerExplosionEnd
+    Segment: 0xA7
+    Address: 0x21c7689
+  - Name: HandlerTripleKickHitCount
+    Segment: 0xA7
+    Address: 0x21c8005

@@ -36,39 +36,28 @@ static void MulPower(u32 numerator, u32 denominator) {
 }
 
 // ---------------- TRIPLE AXEL (813) / POPULATION BOMB (860)
-// Se parte de las entradas de Triple Patada del juego (potencia por golpe + chequeo de punteria en cada golpe)
-extern "C" BattleEventHandlerTableEntry* EventAddTripleKick(u32* handlerAmount);
+// Se reutiliza el manejador de Triple Patada del juego que hace el chequeo de punteria en cada golpe (ESDB.yml)
+extern "C" void HandlerTripleKickHitCount(BattleEventItem* item, ServerFlow* serverFlow, u32 pokemonSlot, u32* work);
 extern "C" void HandlerTripleAxelPower(BattleEventItem* item, ServerFlow* serverFlow, u32 pokemonSlot, u32* work) {
     if (pokemonSlot == BattleEventVar_GetValue(VAR_ATTACKING_MON)) {
         ++work[0];
         BattleEventVar_RewriteValue(VAR_MOVE_POWER, 20 * work[0]);
     }
 }
-BattleEventHandlerTableEntry TripleAxelHandlers[4];
+BattleEventHandlerTableEntry TripleAxelHandlers[]{
+    {EVENT_MOVE_BASE_POWER, HandlerTripleAxelPower},
+    {EVENT_MOVE_HIT_COUNT, HandlerTripleKickHitCount},
+};
 extern "C" BattleEventHandlerTableEntry* EventAddTripleAxel(u32* handlerAmount) {
-    u32 baseAmount = 0;
-    BattleEventHandlerTableEntry* base = EventAddTripleKick(&baseAmount);
-    if (baseAmount > 4)
-        baseAmount = 4;
-    for (u32 i = 0; i < baseAmount; ++i) {
-        TripleAxelHandlers[i] = base[i];
-        if (base[i].eventType == EVENT_MOVE_BASE_POWER)
-            TripleAxelHandlers[i].handler = HandlerTripleAxelPower;
-    }
-    *handlerAmount = baseAmount;
+    *handlerAmount = ARRAY_COUNT(TripleAxelHandlers);
     return TripleAxelHandlers;
 }
-BattleEventHandlerTableEntry PopulationBombHandlers[4];
+// Bomba Poblacion: solo el chequeo de punteria por golpe, sin la potencia creciente
+BattleEventHandlerTableEntry PopulationBombHandlers[]{
+    {EVENT_MOVE_HIT_COUNT, HandlerTripleKickHitCount},
+};
 extern "C" BattleEventHandlerTableEntry* EventAddPopulationBomb(u32* handlerAmount) {
-    u32 baseAmount = 0;
-    BattleEventHandlerTableEntry* base = EventAddTripleKick(&baseAmount);
-    u32 count = 0;
-    for (u32 i = 0; i < baseAmount && count < 4; ++i) {
-        // Solo el chequeo de punteria por golpe, sin la potencia creciente
-        if (base[i].eventType != EVENT_MOVE_BASE_POWER)
-            PopulationBombHandlers[count++] = base[i];
-    }
-    *handlerAmount = count;
+    *handlerAmount = ARRAY_COUNT(PopulationBombHandlers);
     return PopulationBombHandlers;
 }
 
@@ -261,6 +250,41 @@ BattleEventHandlerTableEntry GravAppleHandlers[]{
 extern "C" BattleEventHandlerTableEntry* EventAddGravApple(u32* handlerAmount) {
     *handlerAmount = ARRAY_COUNT(GravAppleHandlers);
     return GravAppleHandlers;
+}
+
+// ---------------- TAKE HEART (850): At. Esp. y Def. Esp. +1 y cura el estado del usuario
+extern "C" void HandlerTakeHeart(BattleEventItem* item, ServerFlow* serverFlow, u32 pokemonSlot, u32* work) {
+    if (pokemonSlot == BattleEventVar_GetValue(VAR_ATTACKING_MON)) {
+        static const StatStage stats[2] = { STATSTAGE_SPECIAL_ATTACK, STATSTAGE_SPECIAL_DEFENSE };
+        for (u32 i = 0; i < 2; ++i) {
+            HandlerParam_ChangeStatStage* statChange;
+            statChange = (HandlerParam_ChangeStatStage*)BattleHandler_PushWork(serverFlow, EFFECT_CHANGE_STAT_STAGE, pokemonSlot);
+            statChange->pokeCount = 1;
+            statChange->pokeID[0] = (u8)pokemonSlot;
+            statChange->moveAnimation = 1;
+            statChange->stat = stats[i];
+            statChange->volume = 1;
+            BattleHandler_PopWork(serverFlow, statChange);
+        }
+
+        BattleMon* currentMon = Handler_GetBattleMon(serverFlow, pokemonSlot);
+        CONDITION status = BattleMon_GetStatus(currentMon);
+        if (status != CONDITION_NONE) {
+            HandlerParam_CureCondition* cureCondition;
+            cureCondition = (HandlerParam_CureCondition*)BattleHandler_PushWork(serverFlow, EFFECT_CURE_STATUS, pokemonSlot);
+            cureCondition->condition = status;
+            cureCondition->pokeID[0] = (u8)pokemonSlot;
+            cureCondition->pokeCount = 1;
+            BattleHandler_PopWork(serverFlow, cureCondition);
+        }
+    }
+}
+BattleEventHandlerTableEntry TakeHeartHandlers[]{
+    {EVENT_UNCATEGORIZED_MOVE, HandlerTakeHeart},
+};
+extern "C" BattleEventHandlerTableEntry* EventAddTakeHeart(u32* handlerAmount) {
+    *handlerAmount = ARRAY_COUNT(TakeHeartHandlers);
+    return TakeHeartHandlers;
 }
 
 // ---------------- SHELL SIDE ARM (801): aproximado, fisico si el Ataque del usuario supera a su At. Esp.
