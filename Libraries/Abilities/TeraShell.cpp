@@ -1,6 +1,8 @@
 #include "settings.h"
 #if EXPAND_ABILITIES
 
+#include "Patches/BattleUpgrade/BattleEngine.h"
+
 #include "server_flow.h"
 
 // TERA SHELL
@@ -10,7 +12,7 @@ extern "C" void HandlerTeraShell(BattleEventItem * item, ServerFlow * serverFlow
         if (BattleMon_IsFullHP(currentMon)) {
             BattleHandler_PushRun(serverFlow, EFFECT_ABILITY_POPUP_ADD, pokemonSlot);
 
-            BattleEventVar_RewriteValue(VAR_SET_TYPE_EFFECTIVENESS, 2);
+            BattleEventVar_RewriteValue(VAR_SET_TYPE_EFFECTIVENESS, OVERRIDE_EFFECTIVENESS_1_2); // antes 2 = neutro (OVERRIDE_EFFECTIVENESS_1); debe ser poco eficaz
 
             BattleHandler_PushRun(serverFlow, EFFECT_ABILITY_POPUP_REMOVE, pokemonSlot);
         }
