@@ -7,7 +7,7 @@
 extern "C" void HandlerSteelworker(BattleEventItem * item, ServerFlow * serverFlow, u32 pokemonSlot, u32 * work) {
     if (pokemonSlot == BattleEventVar_GetValue(VAR_ATTACKING_MON) &&
         BattleEventVar_GetValue(VAR_MOVE_TYPE) == TYPE_STEEL) {
-        BattleEventVar_MulValue(VAR_MOVE_POWER_RATIO, 6138);
+        BattleEventVar_MulValue(VAR_MOVE_POWER_RATIO, 6144);
     }
 }
 BattleEventHandlerTableEntry SteelworkerHandlers[]{
