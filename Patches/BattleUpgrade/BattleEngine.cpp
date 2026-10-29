@@ -5955,6 +5955,19 @@ MoveEventAddTableExt moveEventAddTableExt[] = {
     {MOVE_SPOTLIGHT, EventAddSpotlight, "Moves/Spotlight"},
     {MOVE_LASER_FOCUS, EventAddLaserFocus, "Moves/LaserFocus"},
     {MOVE_GEAR_UP, EventAddMagneticFlux, "Moves/MagneticFlux"},
+    {MOVE_THROAT_CHOP, EventAddThroatChop, "Moves/ThroatChop"},
+    {MOVE_POLLEN_PUFF, EventAddPollenPuff, "Moves/PollenPuff"},
+    {MOVE_SPEED_SWAP, EventAddSpeedSwap, "Moves/SpeedSwap"},
+    {MOVE_AURORA_VEIL, EventAddAuroraVeil, "Moves/AuroraVeil"},
+    {MOVE_STUFF_CHEEKS, EventAddStuffCheeks, "Moves/StuffCheeks"},
+    {MOVE_TAR_SHOT, EventAddTarShot, "Moves/TarShot"},
+    {MOVE_JUNGLE_HEALING, EventAddJungleHealing, "Moves/JungleHealing"},
+    {MOVE_LUNAR_BLESSING, EventAddJungleHealing, "Moves/JungleHealing"},
+    {MOVE_REVIVAL_BLESSING, EventAddRevivalBlessing, "Moves/RevivalBlessing"},
+    {MOVE_SALT_CURE, EventAddSaltCure, "Moves/SaltCure"},
+    {MOVE_TIDY_UP, EventAddTidyUp, "Moves/TidyUp"},
+    {MOVE_SNOWSCAPE, EventAddSnowscape, "Moves/Snowscape"},
+    {MOVE_SYRUP_BOMB, EventAddSyrupBomb, "Moves/SyrupBomb"},
 
     {MOVE_PSYCHIC_TERRAIN, EventAddPsychicTerrain, "Moves/PsychicTerrain"},
 
@@ -5979,6 +5992,10 @@ PosEffectEventAddTableExt posEffectEventAddTableExt[] = {
     {POSEFF_POWDER, EventAddPosPowder, "Moves/Powder"},
     {POSEFF_BANEFUL_BUNKER, EventAddPosBanefulBunker, "Moves/BanefulBunker"},
     {POSEFF_LASER_FOCUS, EventAddPosLaserFocus, "Moves/LaserFocus"},
+    {POSEFF_THROAT_CHOP, EventAddPosThroatChop, "Moves/ThroatChop"},
+    {POSEFF_SALT_CURE, EventAddPosSaltCure, "Moves/SaltCure"},
+    {POSEFF_SYRUP_BOMB, EventAddPosSyrupBomb, "Moves/SyrupBomb"},
+    {POSEFF_TAR_SHOT, EventAddPosTarShot, "Moves/TarShot"},
 };
 
 extern "C" void CMD_ACT_MoveAnimStart(BtlvScu * btlvScu, u32 attckViewPos, u32 defViewPos, u16 moveID, u32 moveTarget, u8 effectIndex, u8 zero);

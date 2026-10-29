@@ -352,6 +352,28 @@ struct SWAN_ALIGNED(4) HandlerParam_Drain
     HandlerParam_StrParams exStr;
 };
 
+struct HandlerParam_SetStat {
+  HandlerParam_Header header;
+  u16 attack;
+  u16 defense;
+  u16 spAttack;
+  u16 spDefense;
+  u16 speed;
+  u8 battleSlot;
+  u8 flags;
+  HandlerParam_StrParams exStr;
+};
+
+// EFFECT_REVIVE (BattleHandler_Revive): revives a fainted party member, on the field or not
+struct HandlerParam_Revive
+{
+    HandlerParam_Header header;
+    u8 pokeID;
+    u8 pad;
+    u16 hp;
+    HandlerParam_StrParams exStr;
+};
+
 extern "C" HandlerParam_Header* BattleHandler_PushWork(ServerFlow* serverFlow, BattleHandlerEffect battleHandler, u32 currentSlot);
 extern "C" void BattleHandler_PopWork(ServerFlow* serverFlow, void* handlerParms);
 extern "C" void BattleHandler_PushRun(ServerFlow* serverFlow, BattleHandlerEffect effect, u32 pokemonSlot);

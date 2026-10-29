@@ -33,6 +33,18 @@ extern "C" BattleEventHandlerTableEntry* EventAddFloralHealing(u32* handlerAmoun
 extern "C" BattleEventHandlerTableEntry* EventAddStrengthSap(u32* handlerAmount);
 extern "C" BattleEventHandlerTableEntry* EventAddSpotlight(u32* handlerAmount);
 extern "C" BattleEventHandlerTableEntry* EventAddLaserFocus(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddThroatChop(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddPollenPuff(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddSpeedSwap(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddAuroraVeil(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddStuffCheeks(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddTarShot(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddJungleHealing(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddRevivalBlessing(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddSaltCure(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddTidyUp(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddSnowscape(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddSyrupBomb(u32* handlerAmount);
 
 extern "C" BattleEventHandlerTableEntry* EventAddPsychicTerrain(u32* handlerAmount);
 
@@ -51,6 +63,10 @@ extern "C" BattleEventHandlerTableEntry* EventAddPosSpikyShield(u32* handlerAmou
 extern "C" BattleEventHandlerTableEntry* EventAddPosPowder(u32* handlerAmount);
 extern "C" BattleEventHandlerTableEntry* EventAddPosBanefulBunker(u32* handlerAmount);
 extern "C" BattleEventHandlerTableEntry* EventAddPosLaserFocus(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddPosThroatChop(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddPosSaltCure(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddPosSyrupBomb(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddPosTarShot(u32* handlerAmount);
 
 extern "C" void GetSideBattleSlots(ServerFlow * serverFlow, u32 side, u8 battleSlots[3]);
 extern "C" u32 PosEffect_SetPriority(BattleEventPriority priority, u32 handlerCount);

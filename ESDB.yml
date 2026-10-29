@@ -3886,3 +3886,6 @@ Symbols:
   - Name: Handler_GetBattleStyle
     Segment: 0xA7
     Address: 0x21abcdd
+  - Name: ServerControl_RemoveSubstitute
+    Segment: 0xA7
+    Address: 0x21a7cb1

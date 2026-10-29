@@ -132,6 +132,9 @@
 #define BATTLE_ION_DELUGE_MSGID 230
 #define BATTLE_CRAFTY_SHIELD_USE_MSGID 231
 #define BATTLE_POWDER_EXPLODE_MSGID 233
+// Hack PokeLobby (lote 2), fichero 19
+#define BATTLE_AURORA_VEIL_MSGID 234 // +0 equipo propio, +1 equipo rival
+#define BATTLE_TIDY_UP_MSGID 236
 // Game Text - File 18
 #define BATTLE_CLEARAMULET_MSGID 878
 #define BATTLE_ELECTRIC_TERRAIN_STATUS_MSGID 1159
@@ -170,6 +173,14 @@
 #define BATTLE_ELECTRIFY_MSGID 1274
 #define BATTLE_POWDER_MSGID 1277
 #define BATTLE_LASER_FOCUS_MSGID 1280
+// Hack PokeLobby (lote 2). 1283-1285 reservados para Burn Up (upstream). Cada mensaje de fichero 18 son 3 variantes (propio, salvaje, enemigo)
+#define BATTLE_BURN_UP_MSGID 1283
+#define BATTLE_SALT_CURE_START_MSGID 1286
+#define BATTLE_SALT_CURE_DAMAGE_MSGID 1289
+#define BATTLE_SYRUP_BOMB_START_MSGID 1292
+#define BATTLE_TAR_SHOT_START_MSGID 1295
+#define BATTLE_THROAT_CHOP_FAIL_MSGID 1298
+#define BATTLE_REVIVED_MSGID 3 // mensaje original del juego: Pokemon revivido
 
 // SCRIPTS
 #define BAG_ITEMUSED_SCRIPT 10144
