@@ -35,4 +35,13 @@ extern "C" BattleEventHandlerTableEntry* EventAddSteelRoller(u32* handlerAmount)
     return SteelRollerHandlers;
 }
 
+// Hack PokeLobby (lote 4): SPLINTERED STORMSHARDS (727). Tras el golpe quita el campo (no falla sin campo)
+BattleEventHandlerTableEntry SplinteredStormshardsHandlers[]{
+    {EVENT_DAMAGE_PROCESSING_END_HIT_REAL, HandlerSteelRoller},
+};
+extern "C" BattleEventHandlerTableEntry* EventAddSplinteredStormshards(u32* handlerAmount) {
+    *handlerAmount = ARRAY_COUNT(SplinteredStormshardsHandlers);
+    return SplinteredStormshardsHandlers;
+}
+
 #endif // EXPAND_MOVES

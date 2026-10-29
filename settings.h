@@ -191,6 +191,10 @@
 #define BATTLE_SHELL_TRAP_MSGID 1307
 // Hack PokeLobby (lote 4), fichero 18 (3 variantes cada uno)
 #define BATTLE_CHILLY_RECEPTION_MSGID 1310
+#define BATTLE_POWER_SHIFT_MSGID 1313
+#define BATTLE_CORROSIVE_GAS_MSGID 1316
+#define BATTLE_INSTRUCT_MSGID 1319
+#define BATTLE_METEOR_BEAM_MSGID 1322
 #define BATTLE_REVIVED_MSGID 3 // mensaje original del juego: Pokemon revivido
 
 // SCRIPTS

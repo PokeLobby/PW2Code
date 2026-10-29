@@ -725,6 +725,11 @@ extern "C" BattleEventHandlerTableEntry * EventAddBrickBreak(u32* handlerAmount)
 extern "C" BattleEventHandlerTableEntry * EventAddSuperFang(u32* handlerAmount);
 extern "C" BattleEventHandlerTableEntry * EventAddUTurn(u32* handlerAmount);
 extern "C" BattleEventHandlerTableEntry * EventAddStoredPower(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry * EventAddReturn(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry * EventAddEruption(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry * EventAddHiJumpKick(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry * EventAddExplosion(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry * EventAddProtect(u32* handlerAmount);
 
 extern "C" void MoveEvent_ForceRemoveItemFromBattleMon(BattleMon* battleMon, MOVE_ID moveID);
 extern "C" bool MoveEvent_CanEffectBeRegistered(u32 battleSlot, MOVE_ID moveID, u8 * output);

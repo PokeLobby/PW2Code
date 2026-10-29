@@ -3904,3 +3904,18 @@ Symbols:
   - Name: EventAddStoredPower
     Segment: 0xA7
     Address: 0x21cc8f5
+  - Name: EventAddReturn
+    Segment: 0xA7
+    Address: 0x21c82ed
+  - Name: EventAddEruption
+    Segment: 0xA7
+    Address: 0x21c81f5
+  - Name: EventAddHiJumpKick
+    Segment: 0xA7
+    Address: 0x21c6185
+  - Name: EventAddExplosion
+    Segment: 0xA7
+    Address: 0x21c7639
+  - Name: EventAddProtect
+    Segment: 0xA7
+    Address: 0x21c9381

@@ -92,6 +92,34 @@ extern "C" BattleEventHandlerTableEntry* EventAddCourtChange(u32* handlerAmount)
 extern "C" BattleEventHandlerTableEntry* EventAddChillyReception(u32* handlerAmount);
 extern "C" BattleEventHandlerTableEntry* EventAddPosFairyLock(u32* handlerAmount);
 extern "C" BattleEventHandlerTableEntry* EventAddPosOctolock(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddMagicPowder(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddDoodle(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddCorrosiveGas(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddPowerShift(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddDragonCheer(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddInstruct(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddPurify(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddPosDragonCheer(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddDireClaw(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddBurningJealousy(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddAlluringVoice(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddCoreEnforcer(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddGuardianOfAlola(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddGenesisSupernova(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddBoltBeak(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddMeteorBeam(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddMistyExplosion(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddExpandingForce(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddRisingVoltage(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddTerrainPulse(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddLashOut(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddPoltergeist(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddEerieSpell(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddTeraBlast(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddLastRespects(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddRageFist(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddHardPress(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddSplinteredStormshards(u32* handlerAmount);
 
 extern "C" BattleEventHandlerTableEntry* EventAddPsychicTerrain(u32* handlerAmount);
 

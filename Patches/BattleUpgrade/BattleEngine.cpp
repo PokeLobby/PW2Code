@@ -3052,6 +3052,13 @@ extern "C" u32 THUMB_BRANCH_SAFESTACK_ServerEvent_CalcDamage(ServerFlow * server
     else {
         u32 power = ServerEvent_GetMovePower(serverFlow, attackingMon, defendingMon, moveParam);
         u32 attack = ServerEvent_GetAttackPower(serverFlow, attackingMon, defendingMon, moveParam, critFlag);
+#if EXPAND_MOVES
+        // Hack PokeLobby (lote 4): Plancha Corporal usa la Defensa del usuario (con sus cambios) en lugar del Ataque
+        if (moveParam->moveID == MOVE_BODY_PRESS) {
+            attack = critFlag ? BattleMon_GetStatsForCritDamage(attackingMon, VALUE_DEFENSE_STAT)
+                              : BattleMon_GetValue(attackingMon, VALUE_DEFENSE_STAT);
+        }
+#endif
         u32 defense = ServerEvent_GetTargetDefenses(serverFlow, attackingMon, defendingMon, moveParam, critFlag);
         u8 level = BattleMon_GetValue(attackingMon, VALUE_LEVEL);
         u32 baseDamage = CalcBaseDamage(power, attack, level, defense);
@@ -6118,6 +6125,18 @@ MoveEventAddTableExt moveEventAddTableExt[] = {
     {MOVE_TEATIME, EventAddTeatime, "Moves/FieldMoves"},
     {MOVE_COURT_CHANGE, EventAddCourtChange, "Moves/FieldMoves"},
     {MOVE_CHILLY_RECEPTION, EventAddChillyReception, "Moves/FieldMoves"},
+    {MOVE_MAGIC_POWDER, EventAddMagicPowder, "Moves/StatusMoves"},
+    {MOVE_DOODLE, EventAddDoodle, "Moves/StatusMoves"},
+    {MOVE_CORROSIVE_GAS, EventAddCorrosiveGas, "Moves/StatusMoves"},
+    {MOVE_POWER_SHIFT, EventAddPowerShift, "Moves/StatusMoves"},
+    {MOVE_DRAGON_CHEER, EventAddDragonCheer, "Moves/StatusMoves"},
+    {MOVE_INSTRUCT, EventAddInstruct, "Moves/StatusMoves"},
+    {MOVE_PURIFY, EventAddPurify, "Moves/Purify"},
+    {MOVE_DIRE_CLAW, EventAddDireClaw, "Moves/DamageMoves"},
+    {MOVE_BURNING_JEALOUSY, EventAddBurningJealousy, "Moves/DamageMoves"},
+    {MOVE_ALLURING_VOICE, EventAddAlluringVoice, "Moves/DamageMoves"},
+    {MOVE_MAX_GUARD, EventAddProtect, nullptr},
+
 
     {MOVE_PSYCHIC_TERRAIN, EventAddPsychicTerrain, "Moves/PsychicTerrain"},
 
@@ -6154,6 +6173,7 @@ PosEffectEventAddTableExt posEffectEventAddTableExt[] = {
     {POSEFF_BURNING_BULWARK, EventAddPosBurningBulwark, "Moves/ProtectMoves"},
     {POSEFF_FAIRY_LOCK, EventAddPosFairyLock, "Moves/FieldMoves"},
     {POSEFF_OCTOLOCK, EventAddPosOctolock, "Moves/FieldMoves"},
+    {POSEFF_DRAGON_CHEER, EventAddPosDragonCheer, "Moves/StatusMoves"},
 };
 
 extern "C" void CMD_ACT_MoveAnimStart(BtlvScu * btlvScu, u32 attckViewPos, u32 defViewPos, u16 moveID, u32 moveTarget, u8 effectIndex, u8 zero);
