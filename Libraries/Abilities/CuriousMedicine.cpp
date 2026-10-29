@@ -7,59 +7,49 @@
 #include "server_flow.h"
 
 // CURIOUS MEDICINE
-extern "C" void ResetNegativeStatStages(BattleMon * battleMon) {
-
-    if (battleMon->statStageParam.AttackStage < 6) {
-        battleMon->statStageParam.AttackStage = 6;
-    }
-    if (battleMon->statStageParam.DefenseStage < 6) {
-        battleMon->statStageParam.DefenseStage = 6;
-    }
-    if (battleMon->statStageParam.SpeedStage < 6) {
-        battleMon->statStageParam.SpeedStage = 6;
-    }
-    if (battleMon->statStageParam.SpAttackStage < 6) {
-        battleMon->statStageParam.SpAttackStage = 6;
-    }
-    if (battleMon->statStageParam.SpDefenseStage < 6) {
-        battleMon->statStageParam.SpDefenseStage = 6;
-    }
-    if (battleMon->statStageParam.AccuracyStage < 6) {
-        battleMon->statStageParam.AccuracyStage = 6;
-    }
-    if (battleMon->statStageParam.EvasionStage < 6) {
-        battleMon->statStageParam.EvasionStage = 6;
-    }
+// PokeLobby: reinicia TODAS las etapas (no solo las negativas) de los aliados en el campo (no de si mismo),
+// y solo se activa cuando entra el propio Pokemon y tiene algun aliado (antes sacaba cartel y mensaje
+// cada vez que entraba cualquier Pokemon y solo quitaba las negativas).
+extern "C" void ResetAllStatStages(BattleMon * battleMon) {
+    battleMon->statStageParam.AttackStage = 6;
+    battleMon->statStageParam.DefenseStage = 6;
+    battleMon->statStageParam.SpeedStage = 6;
+    battleMon->statStageParam.SpAttackStage = 6;
+    battleMon->statStageParam.SpDefenseStage = 6;
+    battleMon->statStageParam.AccuracyStage = 6;
+    battleMon->statStageParam.EvasionStage = 6;
 }
 extern "C" void HandlerCuriousMedicine(BattleEventItem * item, ServerFlow * serverFlow, u32 pokemonSlot, u32 * work) {
-    BattleHandler_PushRun(serverFlow, EFFECT_ABILITY_POPUP_ADD, pokemonSlot);
+    if (pokemonSlot != BattleEventVar_GetValue(VAR_MON_ID)) {
+        return;
+    }
 
-    u32 currentSlot = BattleEventVar_GetValue(VAR_MON_ID);
-    if (pokemonSlot == currentSlot) {
-        for (u8 i = 0; i < 24; ++i) {
-            BattleMon* affectedMon = PokeCon_GetBattleMon(serverFlow->pokeCon, i);
-            if (affectedMon) {
-
-                u32 affectedSlot = BattleMon_GetID(affectedMon);
-                if (MainModule_IsAllyMonID(pokemonSlot, affectedSlot)) {
-
-                    u32 affectedPos = Handler_PokeIDToPokePos(serverFlow, affectedSlot);
-                    // If it's currently in the battlefield
-                    if (affectedPos != NULL_BATTLE_POS &&
-                        !BattleMon_IsFainted(affectedMon)) {
-
-                        ResetNegativeStatStages(affectedMon);
-                    }
+    b32 anyAlly = 0;
+    for (u8 i = 0; i < 24; ++i) {
+        BattleMon* affectedMon = PokeCon_GetBattleMon(serverFlow->pokeCon, i);
+        if (affectedMon) {
+            u32 affectedSlot = BattleMon_GetID(affectedMon);
+            if (affectedSlot != pokemonSlot && MainModule_IsAllyMonID(pokemonSlot, affectedSlot)) {
+                u32 affectedPos = Handler_PokeIDToPokePos(serverFlow, affectedSlot);
+                // If it's currently in the battlefield
+                if (affectedPos != NULL_BATTLE_POS &&
+                    !BattleMon_IsFainted(affectedMon)) {
+                    ResetAllStatStages(affectedMon);
+                    anyAlly = 1;
                 }
             }
         }
     }
 
-    HandlerParam_Message* message = (HandlerParam_Message*)BattleHandler_PushWork(serverFlow, EFFECT_MESSAGE, pokemonSlot);
-    BattleHandler_StrSetup(&message->str, 1u, BATTLE_CURIOUS_MEDICINE_MSGID);
-    BattleHandler_PopWork(serverFlow, message);
+    if (anyAlly) {
+        BattleHandler_PushRun(serverFlow, EFFECT_ABILITY_POPUP_ADD, pokemonSlot);
 
-    BattleHandler_PushRun(serverFlow, EFFECT_ABILITY_POPUP_REMOVE, pokemonSlot);
+        HandlerParam_Message* message = (HandlerParam_Message*)BattleHandler_PushWork(serverFlow, EFFECT_MESSAGE, pokemonSlot);
+        BattleHandler_StrSetup(&message->str, 1u, BATTLE_CURIOUS_MEDICINE_MSGID);
+        BattleHandler_PopWork(serverFlow, message);
+
+        BattleHandler_PushRun(serverFlow, EFFECT_ABILITY_POPUP_REMOVE, pokemonSlot);
+    }
 }
 BattleEventHandlerTableEntry CuriousMedicineHandlers[]{
     {EVENT_SWITCH_IN, HandlerCuriousMedicine},
