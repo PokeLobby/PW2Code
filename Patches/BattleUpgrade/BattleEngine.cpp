@@ -425,6 +425,15 @@ extern "C" void PokeSet_SortBySpeedDynamic(ServerFlow* serverFlow, ActionOrderWo
                 speedStats[i] = (u16)ServerEvent_CalculateSpeed(serverFlow, actionOrder[i].battleMon, 1);
 
                 priority[i] = ACTION_ORDER_GET_PRIO(actionOrder, i);
+#if EXPAND_MOVES && EXPAND_FIELD_EFFECTS
+                // Hack PokeLobby (lote 4): Deslizamiento Herbal (803) tiene +1 de prioridad con el campo de hierba
+                if (BattleAction_GetAction(&actionOrder[i].action) == 1 &&
+                    ((BattleAction_Fight*)&actionOrder[i].action)->moveID == MOVE_GRASSY_GLIDE &&
+                    g_BattleField && g_BattleField->terrain == TERRAIN_GRASSY &&
+                    !ServerControl_CheckFloating(serverFlow, actionOrder[i].battleMon, 1)) {
+                    priority[i] += 1;
+                }
+#endif
                 // Special priority takes into account item & ability prio boosts (1 = no added prio).
                 int specialPriority = ACTION_ORDER_GET_SPECIAL_PRIO(actionOrder, i);
                 priority[i] += (specialPriority - 1);
@@ -1444,6 +1453,11 @@ extern "C" void BattleField_SetShellTrapHit(u32 battleSlot, u32 value) {
     g_BattleField->shellTrapHit[battleSlot] = (u8)value;
 }
 
+// Hack PokeLobby (lote 4): estado compartido con las DLL (ver include/Lote4.h)
+extern "C" Lote4State* GetLote4State() {
+    return &g_BattleField->lote4;
+}
+
 extern "C" POKE_TYPE BattleField_GetExtraType(u32 battleSlot) {
     return g_BattleField->extraTypes[battleSlot];
 }
@@ -1834,6 +1848,7 @@ extern "C" void THUMB_BRANCH_BattleField_InitCore(BattleFieldExt * battleField, 
     sys_memset(battleField->moveFailedNow, 0, BATTLE_MAX_SLOTS);
     sys_memset(battleField->moveFailedPrev, 0, BATTLE_MAX_SLOTS);
     sys_memset(battleField->shellTrapHit, 0, BATTLE_MAX_SLOTS);
+    sys_memset(&battleField->lote4, 0, sizeof(Lote4State));
 
 #endif 
 }
@@ -2675,6 +2690,35 @@ extern "C" void BattleSideEffect_Clear(BattleSideEffectExt* sideEffect) {
     sideEffect->count = 0;
 }
 
+// Hack PokeLobby (lote 4): Cambio de Cancha. Intercambia los efectos de campo de los dos bandos
+// (pantallas, vientos, trampas...). Devuelve cuantos efectos ha movido. No mueve Anticipo ni Vastaguardia.
+extern "C" u32 SwapSideEffects() {
+    static const SIDE_EFFECT swappable[] = {
+        SIDEEFF_REFLECT, SIDEEFF_LIGHT_SCREEN, SIDEEFF_SAFEGUARD, SIDEEFF_MIST, SIDEEFF_TAILWIND, SIDEEFF_LUCKY_CHANT,
+        SIDEEFF_SPIKES, SIDEEFF_TOXIC_SPIKES, SIDEEFF_STEALTH_ROCK, SIDEEFF_RAINBOW, SIDEEFF_SEA_OF_FIRE, SIDEEFF_SWAMP,
+        SIDEEFF_STICKY_WEB,
+    };
+    u32 moved = 0;
+    for (u32 i = 0; i < ARRAY_COUNT(swappable); ++i) {
+        SIDE_EFFECT effect = swappable[i];
+        BattleSideEffectExt* sideA = &(g_SideManager.sides[0].effects[effect]);
+        BattleSideEffectExt* sideB = &(g_SideManager.sides[1].effects[effect]);
+        if (!sideA->item && !sideB->item)
+            continue;
+
+        BattleSideEffectExt buffer = *sideA;
+        *sideA = *sideB;
+        *sideB = buffer;
+        // El evento recuerda a que lado pertenece (dependID)
+        if (sideA->item)
+            sideA->item->dependID = 0;
+        if (sideB->item)
+            sideB->item->dependID = 1;
+        ++moved;
+    }
+    return moved;
+}
+
 struct SideEffectEventAddTableExt
 {
     SIDE_EFFECT sideEffect;
@@ -3090,6 +3134,14 @@ extern "C" u32 THUMB_BRANCH_SAFESTACK_ServerEvent_CalcDamage(ServerFlow * server
     BattleEvent_CallHandlers(serverFlow, EVENT_MOVE_DAMAGE_PROCESSING_END);
     BattleEventVar_Pop();
     *destDamage = (u16)finalDamage;
+
+#if EXPAND_MOVES
+    // Hack PokeLobby (lote 4): golpes recibidos (Puno Furia)
+    if (g_BattleField && defendingSlot < BATTLE_MAX_SLOTS && finalDamage && !Handler_IsSimulationMode(serverFlow)) {
+        if (g_BattleField->lote4.timesHit[defendingSlot] < 255)
+            ++g_BattleField->lote4.timesHit[defendingSlot];
+    }
+#endif
 
     return isFixedDamage;
 }
@@ -5164,6 +5216,7 @@ extern "C" void THUMB_BRANCH_BattleMon_ClearForSwitchOut(BattleMon* battleMon) {
 #if EXPAND_MOVES
     BattleField_ClearMoveFailed(BattleMon_GetID(battleMon));
     BattleField_SetShellTrapHit(BattleMon_GetID(battleMon), 0);
+    GetLote4State()->noRetreat[BattleMon_GetID(battleMon)] = 0;
 #endif
     sys_memset(battleMon->turnFlag, 0, 2u);
     BattleMon_ClearTransformChange(battleMon);
@@ -6012,13 +6065,11 @@ MoveEventAddTableExt moveEventAddTableExt[] = {
     {MOVE_GRASSY_TERRAIN, EventAddGrassyTerrain, "Moves/GrassyTerrain"},
     {MOVE_MISTY_TERRAIN, EventAddMistyTerrain, "Moves/MistyTerrain"},
     {MOVE_ELECTRIFY, EventAddElectrify, "Moves/Electrify"},
-    {MOVE_FAIRY_LOCK, EventAddSpiderWeb, nullptr},
     {MOVE_KINGS_SHIELD, EventAddKingsShield, "Moves/KingsShield"},
     {MOVE_SPIKY_SHIELD, EventAddSpikyShield, "Moves/SpikyShield"},
     {MOVE_VENOM_DRENCH, EventAddVenomDrench, "Moves/VenomDrench"},
     {MOVE_POWDER, EventAddPowder, "Moves/Powder"},
     {MOVE_MAGNETIC_FLUX, EventAddMagneticFlux, "Moves/MagneticFlux"},
-    {MOVE_HAPPY_HOUR, EventAddPayDay, nullptr},
     {MOVE_ELECTRIC_TERRAIN, EventAddElectricTerrain, "Moves/ElectricTerrain"},
     {MOVE_HOLD_BACK, EventAddFalseSwipe, nullptr},
     {MOVE_INFESTATION, EventAddBind, nullptr},
@@ -6052,6 +6103,22 @@ MoveEventAddTableExt moveEventAddTableExt[] = {
     {MOVE_SNOWSCAPE, EventAddSnowscape, "Moves/Snowscape"},
     {MOVE_SYRUP_BOMB, EventAddSyrupBomb, "Moves/SyrupBomb"},
 
+    // Hack PokeLobby (lote 4)
+    {MOVE_OBSTRUCT, EventAddObstruct, "Moves/ProtectMoves"},
+    {MOVE_SILK_TRAP, EventAddSilkTrap, "Moves/ProtectMoves"},
+    {MOVE_BURNING_BULWARK, EventAddBurningBulwark, "Moves/ProtectMoves"},
+    {MOVE_EXTREME_EVOBOOST, EventAddExtremeEvoboost, "Moves/SelfBoost"},
+    {MOVE_CLANGOROUS_SOULBLAZE, EventAddClangorousSoulblaze, "Moves/SelfBoost"},
+    {MOVE_CLANGOROUS_SOUL, EventAddClangorousSoul, "Moves/SelfBoost"},
+    {MOVE_FILLET_AWAY, EventAddFilletAway, "Moves/SelfBoost"},
+    {MOVE_NO_RETREAT, EventAddNoRetreat, "Moves/SelfBoost"},
+    {MOVE_FAIRY_LOCK, EventAddFairyLock, "Moves/FieldMoves"},
+    {MOVE_OCTOLOCK, EventAddOctolock, "Moves/FieldMoves"},
+    {MOVE_HAPPY_HOUR, EventAddHappyHour, "Moves/FieldMoves"},
+    {MOVE_TEATIME, EventAddTeatime, "Moves/FieldMoves"},
+    {MOVE_COURT_CHANGE, EventAddCourtChange, "Moves/FieldMoves"},
+    {MOVE_CHILLY_RECEPTION, EventAddChillyReception, "Moves/FieldMoves"},
+
     {MOVE_PSYCHIC_TERRAIN, EventAddPsychicTerrain, "Moves/PsychicTerrain"},
 
     {MOVE_PLASMA_FIST, EventAddPlasmaFist, "Moves/IonDeluge"},
@@ -6082,6 +6149,11 @@ PosEffectEventAddTableExt posEffectEventAddTableExt[] = {
     {POSEFF_SHED_TAIL, EventAddPosShedTail, "Moves/ShedTail"},
     {POSEFF_BEAK_BLAST, EventAddPosBeakBlast, "Moves/BeakBlast"},
     {POSEFF_SHELL_TRAP, EventAddPosShellTrap, "Moves/ShellTrap"},
+    {POSEFF_OBSTRUCT, EventAddPosObstruct, "Moves/ProtectMoves"},
+    {POSEFF_SILK_TRAP, EventAddPosSilkTrap, "Moves/ProtectMoves"},
+    {POSEFF_BURNING_BULWARK, EventAddPosBurningBulwark, "Moves/ProtectMoves"},
+    {POSEFF_FAIRY_LOCK, EventAddPosFairyLock, "Moves/FieldMoves"},
+    {POSEFF_OCTOLOCK, EventAddPosOctolock, "Moves/FieldMoves"},
 };
 
 extern "C" void CMD_ACT_MoveAnimStart(BtlvScu * btlvScu, u32 attckViewPos, u32 defViewPos, u16 moveID, u32 moveTarget, u8 effectIndex, u8 zero);
@@ -6373,6 +6445,15 @@ extern "C" b32 THUMB_BRANCH_SAFESTACK_ServerEvent_CheckStatStageChangeSuccess(Se
     BattleEventVar_Pop();
 
     if (!failFlag) {
+#if EXPAND_MOVES
+        // Hack PokeLobby (lote 4): recuerda si al Pokemon le han subido / bajado una estadistica este turno
+        if (g_BattleField && affectedSlot < BATTLE_MAX_SLOTS) {
+            if (volume > 0)
+                g_BattleField->lote4.statRaisedTurn[affectedSlot] = serverFlow->turnCount + 1;
+            else if (volume < 0)
+                g_BattleField->lote4.statLoweredTurn[affectedSlot] = serverFlow->turnCount + 1;
+        }
+#endif
         return 1;
     }
     return 0;

@@ -2,6 +2,7 @@
 #define MOVE_EXPANSION_H
 
 #include "battle_events.h"
+#include "Lote4.h"
 
 extern "C" BattleEventHandlerTableEntry * EventAddFlyingPress(u32 * handlerAmount);
 extern "C" BattleEventHandlerTableEntry * EventAddMatBlock(u32 * handlerAmount); 
@@ -67,6 +68,30 @@ extern "C" void BattleField_BeginMoveAction(u32 battleSlot);
 extern "C" void BattleField_ClearMoveFailed(u32 battleSlot);
 extern "C" b32 BattleField_GetShellTrapHit(u32 battleSlot);
 extern "C" void BattleField_SetShellTrapHit(u32 battleSlot, u32 value);
+
+// Hack PokeLobby (lote 4)
+extern "C" Lote4State* GetLote4State();
+extern "C" u32 SwapSideEffects();
+extern "C" b32 AbilityFailChange(u32 ability);
+extern "C" BattleEventHandlerTableEntry* EventAddObstruct(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddSilkTrap(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddBurningBulwark(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddExtremeEvoboost(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddClangorousSoulblaze(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddClangorousSoul(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddFilletAway(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddNoRetreat(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddPosObstruct(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddPosSilkTrap(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddPosBurningBulwark(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddFairyLock(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddOctolock(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddHappyHour(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddTeatime(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddCourtChange(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddChillyReception(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddPosFairyLock(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddPosOctolock(u32* handlerAmount);
 
 extern "C" BattleEventHandlerTableEntry* EventAddPsychicTerrain(u32* handlerAmount);
 

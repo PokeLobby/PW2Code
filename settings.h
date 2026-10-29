@@ -135,6 +135,11 @@
 // Hack PokeLobby (lote 2), fichero 19
 #define BATTLE_AURORA_VEIL_MSGID 234 // +0 equipo propio, +1 equipo rival
 #define BATTLE_TIDY_UP_MSGID 236
+// Hack PokeLobby (lote 4), fichero 19
+#define BATTLE_FAIRY_LOCK_MSGID 237
+#define BATTLE_COURT_CHANGE_MSGID 238
+#define BATTLE_HAPPY_HOUR_MSGID 239
+#define BATTLE_TEATIME_MSGID 240
 // Game Text - File 18
 #define BATTLE_CLEARAMULET_MSGID 878
 #define BATTLE_ELECTRIC_TERRAIN_STATUS_MSGID 1159
@@ -184,6 +189,8 @@
 // Hack PokeLobby (lote 3)
 #define BATTLE_BEAK_BLAST_MSGID 1304
 #define BATTLE_SHELL_TRAP_MSGID 1307
+// Hack PokeLobby (lote 4), fichero 18 (3 variantes cada uno)
+#define BATTLE_CHILLY_RECEPTION_MSGID 1310
 #define BATTLE_REVIVED_MSGID 3 // mensaje original del juego: Pokemon revivido
 
 // SCRIPTS

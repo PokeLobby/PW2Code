@@ -11,6 +11,7 @@
 #include "conditions.h"
 #include "items.h"
 #include "abilities.h"
+#include "Lote4.h"
 
 struct BattleFieldExt
 {
@@ -107,6 +108,9 @@ struct BattleFieldExt
 
     // Coraza Trampa: 1 si el Pokemon con la trampa ha recibido un golpe fisico este turno
     u8 shellTrapHit[BATTLE_MAX_SLOTS];
+
+    // Hack PokeLobby (lote 4): estado de los ataques del lote 4
+    Lote4State lote4;
 #endif // EXPAND_MOVES
 };
 
