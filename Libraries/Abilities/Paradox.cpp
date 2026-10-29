@@ -16,19 +16,25 @@ extern "C" StatStage GetHighestStatWithBoosts(BattleMon * battleMon) {
     u16 highest = BattleMon_GetValue(battleMon, VALUE_ATTACK_STAT);
     StatStage output = STATSTAGE_ATTACK;
 
-    if (u16 defense = BattleMon_GetValue(battleMon, VALUE_DEFENSE_STAT) > highest) {
+    // PokeLobby: antes era "if (u16 x = valor > highest)" (guardaba un bool, no el valor) y
+    // usaba VALUE_*_STAGE (etapas) en At.Esp./Def.Esp.; empates -> gana el primero (At, Def, AtEsp, DefEsp, Vel)
+    u16 defense = BattleMon_GetValue(battleMon, VALUE_DEFENSE_STAT);
+    if (defense > highest) {
         highest = defense;
         output = STATSTAGE_DEFENSE;
     }
-    if (u16 specialAttack = BattleMon_GetValue(battleMon, VALUE_SPECIAL_ATTACK_STAGE) > highest) {
+    u16 specialAttack = BattleMon_GetValue(battleMon, VALUE_SPECIAL_ATTACK_STAT);
+    if (specialAttack > highest) {
         highest = specialAttack;
         output = STATSTAGE_SPECIAL_ATTACK;
     }
-    if (u16 specialDefense = BattleMon_GetValue(battleMon, VALUE_SPECIAL_DEFENSE_STAGE) > highest) {
+    u16 specialDefense = BattleMon_GetValue(battleMon, VALUE_SPECIAL_DEFENSE_STAT);
+    if (specialDefense > highest) {
         highest = specialDefense;
         output = STATSTAGE_SPECIAL_DEFENSE;
     }
-    if (u16 speed = BattleMon_GetValue(battleMon, VALUE_SPEED_STAT) > highest) {
+    u16 speed = BattleMon_GetValue(battleMon, VALUE_SPEED_STAT);
+    if (speed > highest) {
         highest = speed;
         output = STATSTAGE_SPEED;
     }
@@ -82,7 +88,7 @@ extern "C" void CommonParadoxAttackHandler(ServerFlow * serverFlow, u32 pokemonS
 
             MoveCategory category = CATEGORY_PHYSICAL;
             if (stat == STATSTAGE_SPECIAL_ATTACK) {
-                MoveCategory category = CATEGORY_SPECIAL;
+                category = CATEGORY_SPECIAL; // antes se redeclaraba la variable y nunca cambiaba
             }
             if (category == BattleEventVar_GetValue(VAR_MOVE_CATEGORY)) {
                 BattleEventVar_MulValue(VAR_RATIO, 5324);
@@ -97,7 +103,7 @@ extern "C" void CommonParadoxDefenseHandler(ServerFlow * serverFlow, u32 pokemon
             (stat == STATSTAGE_DEFENSE || stat == STATSTAGE_SPECIAL_DEFENSE)) {
             MoveCategory category = CATEGORY_PHYSICAL;
             if (stat == STATSTAGE_SPECIAL_DEFENSE) {
-                MoveCategory category = CATEGORY_SPECIAL;
+                category = CATEGORY_SPECIAL;
             }
 
             if (category == BattleEventVar_GetValue(VAR_MOVE_CATEGORY)) {
