@@ -6,7 +6,7 @@
 // GALE WINGS
 extern "C" void HandlerGaleWings(BattleEventItem * item, ServerFlow * serverFlow, u32 pokemonSlot, u32 * work) {
     if (pokemonSlot == BattleEventVar_GetValue(VAR_ATTACKING_MON)) {
-#if GEN6_GALE_WINGS
+#if !GEN6_GALE_WINGS // corregido: 0 = regla actual (solo con PS al maximo)
         BattleMon* attackingMon = Handler_GetBattleMon(serverFlow, pokemonSlot);
         if (BattleMon_IsFullHP(attackingMon))
 #endif
