@@ -3889,3 +3889,6 @@ Symbols:
   - Name: ServerControl_RemoveSubstitute
     Segment: 0xA7
     Address: 0x21a7cb1
+  - Name: BattleMon_CreateSubstitute
+    Segment: 0xA7
+    Address: 0x21bc59d

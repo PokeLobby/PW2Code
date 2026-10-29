@@ -43,6 +43,7 @@ extern "C" BattleEventHandlerTableEntry* EventAddJungleHealing(u32* handlerAmoun
 extern "C" BattleEventHandlerTableEntry* EventAddRevivalBlessing(u32* handlerAmount);
 extern "C" BattleEventHandlerTableEntry* EventAddSaltCure(u32* handlerAmount);
 extern "C" BattleEventHandlerTableEntry* EventAddTidyUp(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddShedTail(u32* handlerAmount);
 extern "C" BattleEventHandlerTableEntry* EventAddSnowscape(u32* handlerAmount);
 extern "C" BattleEventHandlerTableEntry* EventAddSyrupBomb(u32* handlerAmount);
 
@@ -67,6 +68,7 @@ extern "C" BattleEventHandlerTableEntry* EventAddPosThroatChop(u32* handlerAmoun
 extern "C" BattleEventHandlerTableEntry* EventAddPosSaltCure(u32* handlerAmount);
 extern "C" BattleEventHandlerTableEntry* EventAddPosSyrupBomb(u32* handlerAmount);
 extern "C" BattleEventHandlerTableEntry* EventAddPosTarShot(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddPosShedTail(u32* handlerAmount);
 
 extern "C" void GetSideBattleSlots(ServerFlow * serverFlow, u32 side, u8 battleSlots[3]);
 extern "C" u32 PosEffect_SetPriority(BattleEventPriority priority, u32 handlerCount);

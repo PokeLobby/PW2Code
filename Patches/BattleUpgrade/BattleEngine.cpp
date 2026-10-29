@@ -5966,6 +5966,7 @@ MoveEventAddTableExt moveEventAddTableExt[] = {
     {MOVE_REVIVAL_BLESSING, EventAddRevivalBlessing, "Moves/RevivalBlessing"},
     {MOVE_SALT_CURE, EventAddSaltCure, "Moves/SaltCure"},
     {MOVE_TIDY_UP, EventAddTidyUp, "Moves/TidyUp"},
+    {MOVE_SHED_TAIL, EventAddShedTail, "Moves/ShedTail"},
     {MOVE_SNOWSCAPE, EventAddSnowscape, "Moves/Snowscape"},
     {MOVE_SYRUP_BOMB, EventAddSyrupBomb, "Moves/SyrupBomb"},
 
@@ -5996,6 +5997,7 @@ PosEffectEventAddTableExt posEffectEventAddTableExt[] = {
     {POSEFF_SALT_CURE, EventAddPosSaltCure, "Moves/SaltCure"},
     {POSEFF_SYRUP_BOMB, EventAddPosSyrupBomb, "Moves/SyrupBomb"},
     {POSEFF_TAR_SHOT, EventAddPosTarShot, "Moves/TarShot"},
+    {POSEFF_SHED_TAIL, EventAddPosShedTail, "Moves/ShedTail"},
 };
 
 extern "C" void CMD_ACT_MoveAnimStart(BtlvScu * btlvScu, u32 attckViewPos, u32 defViewPos, u16 moveID, u32 moveTarget, u8 effectIndex, u8 zero);
