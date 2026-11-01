@@ -20,6 +20,9 @@
 #define REMOVE_LOCATION_LIMIT 1
 
 #define PERFECT_TRAINERS 1
+	// Hack PokeLobby: EV de entrenador leidos de un fichero de la ROM (ver Patches/Base/Trainers.cpp)
+	#define TRAINER_EVS 1
+	#define TRAINER_EVS_FILE "pokelobby_evs.bin"
 
 #define DYNAMIC_SPEED 1
 	#define DYNAMIC_SPEED_DEBUG 0	
