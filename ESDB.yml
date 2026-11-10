@@ -3879,7 +3879,7 @@ Symbols:
     Address: 0x21cbc8d
   - Name: HandlerFollowMeCheckFail
     Segment: 0xA7
-    Address: 0x21c63dc
+    Address: 0x21c63d9
   - Name: HandlerFollowMeTurnCheck
     Segment: 0xA7
     Address: 0x21c64dd
