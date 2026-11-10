@@ -151,6 +151,7 @@ FULL_COPY_HandlerTrick_0x9A:
 
 FULL_COPY_HandlerBestow_0x66:
     nop
+    nop     @ el "bl GetSpecies" original ocupa 4 bytes (dos mitades Thumb): hay que anular ambas
     .size FULL_COPY_HandlerBestow_0x66, . - FULL_COPY_HandlerBestow_0x66
 
 FULL_COPY_HandlerCommon_CheckUnchangeableItem_0x18:
