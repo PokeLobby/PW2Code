@@ -26,6 +26,7 @@
 //  801 Moluscanon (Shell Side Arm)     fisico si el Ataque supera al At. Esp. (aproximado)
 //  892 Electropalmas (Double Shock) esta en RemoveType.cpp
 //  92  Toxico (Toxic)                     no falla si lo usa un tipo Veneno (Gen 6+, issue-82)
+//  329 Frio Polar (Sheer Cold)            los de tipo Hielo son inmunes (Gen 7+; la precision 20 % para no-Hielo NO esta hecha, ver #82)
 //  282 Desarme (Knock Off)                x1,5 de potencia si el objetivo lleva un objeto que se le puede quitar (Gen 6+, issue-82)
 
 // ---------------- utilidades
@@ -342,6 +343,26 @@ BattleEventHandlerTableEntry KnockOffHandlers[]{
 extern "C" BattleEventHandlerTableEntry* EventAddKnockOffUpdated(u32* handlerAmount) {
     *handlerAmount = ARRAY_COUNT(KnockOffHandlers);
     return KnockOffHandlers;
+}
+
+// ---------------- SHEER COLD (329): inmunidad del tipo Hielo
+extern "C" void HandlerSheerColdImmunity(BattleEventItem* item, ServerFlow* serverFlow, u32 pokemonSlot, u32* work) {
+    if (pokemonSlot == BattleEventVar_GetValue(VAR_ATTACKING_MON)) {
+        u32 defendingSlot = BattleEventVar_GetValue(VAR_DEFENDING_MON);
+        if (defendingSlot >= BATTLE_MAX_SLOTS)
+            return;
+        BattleMon* defendingMon = Handler_GetBattleMon(serverFlow, defendingSlot);
+        if (defendingMon && BattleMon_HasType(defendingMon, TYPE_ICE)) {
+            BattleEventVar_RewriteValue(VAR_NO_EFFECT_FLAG, 1);
+        }
+    }
+}
+BattleEventHandlerTableEntry SheerColdHandlers[]{
+    {EVENT_ABILITY_CHECK_NO_EFFECT, HandlerSheerColdImmunity},
+};
+extern "C" BattleEventHandlerTableEntry* EventAddSheerCold(u32* handlerAmount) {
+    *handlerAmount = ARRAY_COUNT(SheerColdHandlers);
+    return SheerColdHandlers;
 }
 
 #endif // EXPAND_MOVES

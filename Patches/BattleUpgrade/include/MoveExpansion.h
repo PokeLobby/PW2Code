@@ -63,6 +63,7 @@ extern "C" BattleEventHandlerTableEntry* EventAddShellTrap(u32* handlerAmount);
 extern "C" BattleEventHandlerTableEntry* EventAddSpectralThief(u32* handlerAmount);
 extern "C" BattleEventHandlerTableEntry* EventAddSteelRoller(u32* handlerAmount);
 extern "C" BattleEventHandlerTableEntry* EventAddToxic(u32* handlerAmount);
+extern "C" BattleEventHandlerTableEntry* EventAddSheerCold(u32* handlerAmount);
 extern "C" BattleEventHandlerTableEntry* EventAddKnockOffUpdated(u32* handlerAmount);
 extern "C" b32 BattleField_GetMoveFailedPrev(u32 battleSlot);
 extern "C" void BattleField_SetMoveFailedNow(u32 battleSlot);

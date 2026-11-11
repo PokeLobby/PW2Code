@@ -6236,6 +6236,7 @@ MoveEventAddTableExt moveEventAddTableExt[] = {
 
 struct PosEffectEventAddTableExt
 {
+    {MOVE_SHEER_COLD, EventAddSheerCold, "Moves/ExtraMoves"},
     POS_EFFECT posEffect;
     PosEffectEventAddFunc func;
     const char* dllName;
