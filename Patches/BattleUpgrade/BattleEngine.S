@@ -265,3 +265,19 @@ FULL_COPY_ServerFlow_CheckConfusionHitSelf_0x74:
     .size FULL_COPY_ServerFlow_CheckConfusionHitSelf_0x74, . - FULL_COPY_ServerFlow_CheckConfusionHitSelf_0x74
 
 #endif // GEN9_CONFUSION_CHANCE
+
+#if GEN9_SHEER_COLD_ACCURACY
+
+.type THUMB_BRANCH_LINK_ServerEvent_CheckOHKOHit_0x94, %function
+
+@ ServerEvent_CheckOHKOHit (0x21aa5f4, tirada de los ataques de KO): en +0x94 lee la precision base del ataque con PML_MoveGetParam(ataque, 4)
+@ y la suma al nivel de diferencia. Se redirige a Gen9_OHKOAccuracy pasandole tambien el atacante (r6, callee-saved) para poder mirar su tipo.
+.balign 4
+THUMB_BRANCH_LINK_ServerEvent_CheckOHKOHit_0x94:
+    push    {lr}
+    movs    r2, r6
+    bl      Gen9_OHKOAccuracy
+    pop     {pc}
+    .size THUMB_BRANCH_LINK_ServerEvent_CheckOHKOHit_0x94, . - THUMB_BRANCH_LINK_ServerEvent_CheckOHKOHit_0x94
+
+#endif // GEN9_SHEER_COLD_ACCURACY

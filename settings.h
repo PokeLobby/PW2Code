@@ -47,6 +47,9 @@
 // Hack PokeLobby (issue-82, Gen 9): la confusion te hace pegarte a ti mismo con probabilidad 33 % (Gen 5: 50 %)
 #define GEN9_CONFUSION_CHANCE 1
 
+// Hack PokeLobby (issue-82, Gen 9): Frio Polar tiene 20 % de precision base si lo usa un Pokemon que no es de tipo Hielo (30 % si lo es)
+#define GEN9_SHEER_COLD_ACCURACY 1
+
 #define WEATHER_ABILITY_TURNS 5 // 255 means infinite turns
 
 #define SNOW_WEATHER 1

@@ -5788,6 +5788,17 @@ extern "C" void THUMB_BRANCH_LINK_ClearMoveStatusWork_0x2E(u8* counters, u32 val
         counters[2] = sleepTurns;
 }
 #endif // GEN9_SLEEP_KEEP
+#if GEN9_SHEER_COLD_ACCURACY
+// ServerEvent_CheckOHKOHit (0x21aa5f4) calcula la probabilidad de los ataques de KO como precision del ataque + (nivel atacante - nivel objetivo).
+// La precision se lee en +0x94 con PML_MoveGetParam(ataque, MVDATA_ACCURACY); el shim de BattleEngine.S lo redirige aqui y anade el atacante.
+// Gen 7+: Frio Polar tiene 20 % de precision base si lo usa un Pokemon que no es de tipo Hielo (los de tipo Hielo conservan el 30 % del MoveData).
+extern "C" u32 Gen9_OHKOAccuracy(u32 moveID, u32 field, BattleMon* attacker) {
+    u32 accuracy = PML_MoveGetParam((MOVE_ID)moveID, (MoveField)field);
+    if (moveID == MOVE_SHEER_COLD && !BattleMon_HasType(attacker, TYPE_ICE))
+        accuracy = 20;
+    return accuracy;
+}
+#endif // GEN9_SHEER_COLD_ACCURACY
 extern "C" WEATHER THUMB_BRANCH_LINK_HandlerThunderSunCheck_0x12(ServerFlow* serverFlow) {
     return Handler_CheckWeather(serverFlow, BattleEventVar_GetValue(VAR_ATTACKING_MON), BattleEventVar_GetValue(VAR_DEFENDING_MON), ServerEvent_GetWeather(serverFlow));
 }
