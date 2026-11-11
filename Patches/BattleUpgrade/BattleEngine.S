@@ -228,3 +228,12 @@ FULL_COPY_ServerEvent_CalculateSpeed_0x80:
     .size FULL_COPY_ServerEvent_CalculateSpeed_0x80, . - FULL_COPY_ServerEvent_CalculateSpeed_0x80
 
 #endif // GEN9_PARALYSIS_SPEED
+
+#if GEN9_BURN_DAMAGE
+
+@ BattleMon_GetConditionDamage (tabla de saltos por estado): el caso de la quemadura (4) hacia PS maximos / 8; ahora / 16
+FULL_COPY_BattleMon_GetConditionDamage_0x62:
+    movs    r1, #16
+    .size FULL_COPY_BattleMon_GetConditionDamage_0x62, . - FULL_COPY_BattleMon_GetConditionDamage_0x62
+
+#endif // GEN9_BURN_DAMAGE

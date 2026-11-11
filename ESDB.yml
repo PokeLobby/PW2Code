@@ -2521,6 +2521,9 @@ Symbols:
   - Name: ClearMoveStatusWork
     Segment: 0xA7
     Address: 0x21bbbf9
+  - Name: BattleMon_GetConditionDamage
+    Segment: 0xA7
+    Address: 0x21bbb65
   - Name: ResetStatStages
     Segment: 0xA7
     Address: 0x21bac09
