@@ -219,3 +219,12 @@ FULL_COPY_167_0x21D74E0:
     .size FULL_COPY_167_0x21D74E0, . - FULL_COPY_167_0x21D74E0
 
 #endif // GEN6_CRIT
+
+#if GEN9_PARALYSIS_SPEED
+
+@ ServerEvent_CalculateSpeed: la rama de paralisis hacia speed = speed * 25 / 100; ahora * 50 / 100
+FULL_COPY_ServerEvent_CalculateSpeed_0x80:
+    movs    r0, #50
+    .size FULL_COPY_ServerEvent_CalculateSpeed_0x80, . - FULL_COPY_ServerEvent_CalculateSpeed_0x80
+
+#endif // GEN9_PARALYSIS_SPEED
