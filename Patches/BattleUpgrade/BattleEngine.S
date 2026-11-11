@@ -256,3 +256,12 @@ FULL_COPY_167_0x21D991A:
     .size FULL_COPY_167_0x21D991A, . - FULL_COPY_167_0x21D991A
 
 #endif // GEN9_PROTECT_CHAIN
+
+#if GEN9_CONFUSION_CHANCE
+
+@ ServerFlow_CheckConfusionHitSelf (0x21a3e00): si el Pokemon sigue confuso, IsOccurPer(50) decide si se pega a si mismo. Gen 9: 33 %.
+FULL_COPY_ServerFlow_CheckConfusionHitSelf_0x74:
+    movs    r0, #33
+    .size FULL_COPY_ServerFlow_CheckConfusionHitSelf_0x74, . - FULL_COPY_ServerFlow_CheckConfusionHitSelf_0x74
+
+#endif // GEN9_CONFUSION_CHANCE

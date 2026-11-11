@@ -44,6 +44,9 @@
 // Hack PokeLobby (issue-82, Gen 9): la paralisis reduce la Velocidad a la mitad (Gen 5: a un cuarto)
 #define GEN9_PARALYSIS_SPEED 1
 
+// Hack PokeLobby (issue-82, Gen 9): la confusion te hace pegarte a ti mismo con probabilidad 33 % (Gen 5: 50 %)
+#define GEN9_CONFUSION_CHANCE 1
+
 #define WEATHER_ABILITY_TURNS 5 // 255 means infinite turns
 
 #define SNOW_WEATHER 1

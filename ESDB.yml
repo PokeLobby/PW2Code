@@ -3952,3 +3952,6 @@ Symbols:
   - Name: HandlerTripleKickHitCount
     Segment: 0xA7
     Address: 0x21c8005
+  - Name: ServerFlow_CheckConfusionHitSelf
+    Segment: 0xA7
+    Address: 0x21a3e01
