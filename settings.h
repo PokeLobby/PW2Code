@@ -29,6 +29,9 @@
 
 #define GEN6_CRIT 1
 
+// Hack PokeLobby (issue-82, Gen 9): las gemas suben el dano x1,3 (Gen 5: x1,5)
+#define GEN9_GEM_BOOST 1
+
 // Hack PokeLobby (issue-82, Gen 9): la quemadura quita 1/16 de los PS maximos por turno (Gen 5: 1/8)
 #define GEN9_BURN_DAMAGE 1
 

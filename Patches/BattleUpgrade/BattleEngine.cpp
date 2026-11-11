@@ -5769,6 +5769,13 @@ extern "C" b32 THUMB_BRANCH_ServerEvent_BypassAccuracyCheck(ServerFlow* serverFl
 extern "C" WEATHER THUMB_BRANCH_LINK_HandlerThunderRainCheck_0x12(ServerFlow* serverFlow) {
     return Handler_CheckWeather(serverFlow, BattleEventVar_GetValue(VAR_ATTACKING_MON), BattleEventVar_GetValue(VAR_DEFENDING_MON), ServerEvent_GetWeather(serverFlow));
 }
+#if GEN9_GEM_BOOST
+// CommonGemPower (0x21c5aec, usada por todas las gemas, tambien Gema Hada): en +0x36 llama a BattleEventVar_MulValue(VAR_RATIO, 6144) (x1,5).
+// Se sustituye esa llamada por una con 5325 (x1,3 en 4096avos, como el resto de bonificaciones de Gen 6+ del hack).
+extern "C" void THUMB_BRANCH_LINK_CommonGemPower_0x36(u32 variable, int ratio) {
+    BattleEventVar_MulValue((BattleEventVar)variable, 5325);
+}
+#endif // GEN9_GEM_BOOST
 extern "C" WEATHER THUMB_BRANCH_LINK_HandlerThunderSunCheck_0x12(ServerFlow* serverFlow) {
     return Handler_CheckWeather(serverFlow, BattleEventVar_GetValue(VAR_ATTACKING_MON), BattleEventVar_GetValue(VAR_DEFENDING_MON), ServerEvent_GetWeather(serverFlow));
 }
