@@ -29,6 +29,9 @@
 
 #define GEN6_CRIT 1
 
+// Hack PokeLobby (issue-82, Gen 9): el contador de sueno no se reinicia al cambiar de Pokemon (Gen 5: se reinicia)
+#define GEN9_SLEEP_KEEP 1
+
 // Hack PokeLobby (issue-82, Gen 9): Proteccion y similares en cadena: probabilidad 1/3 por uso consecutivo (Gen 5: 1/2)
 #define GEN9_PROTECT_CHAIN 1
 

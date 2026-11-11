@@ -5776,6 +5776,18 @@ extern "C" void THUMB_BRANCH_LINK_CommonGemPower_0x36(u32 variable, int ratio) {
     BattleEventVar_MulValue((BattleEventVar)variable, 5325);
 }
 #endif // GEN9_GEM_BOOST
+#if GEN9_SLEEP_KEEP
+// ClearMoveStatusWork (0x21bbbf8) se llama al sacar/entrar/limpiar un Pokemon y pone a cero los 36 contadores de estado (BattleMon+0xAC, uno por
+// condicion; el del sueno es el byte +0xAE). En +0x2E hace sys_memset(mon + 0xAC, 0, 36). Esta version conserva el contador del sueno si el Pokemon
+// sigue dormido (Gen 9: el sueno no se reinicia al cambiar). El estado esta en la palabra BattleMon+0x24 (bits 0-2; 2 = sueno).
+extern "C" void THUMB_BRANCH_LINK_ClearMoveStatusWork_0x2E(u8* counters, u32 value, u32 size) {
+    u32 status = *(u32*)(counters - 0xAC + 0x24) & 7;
+    u8 sleepTurns = counters[2];
+    sys_memset(counters, value, size);
+    if (status == CONDITION_SLEEP)
+        counters[2] = sleepTurns;
+}
+#endif // GEN9_SLEEP_KEEP
 extern "C" WEATHER THUMB_BRANCH_LINK_HandlerThunderSunCheck_0x12(ServerFlow* serverFlow) {
     return Handler_CheckWeather(serverFlow, BattleEventVar_GetValue(VAR_ATTACKING_MON), BattleEventVar_GetValue(VAR_DEFENDING_MON), ServerEvent_GetWeather(serverFlow));
 }
@@ -6224,6 +6236,7 @@ MoveEventAddTableExt moveEventAddTableExt[] = {
     // Hack PokeLobby (issue-82, Gen 9)
     {MOVE_TOXIC, EventAddToxic, "Moves/ExtraMoves"},
     {MOVE_KNOCK_OFF, EventAddKnockOffUpdated, "Moves/ExtraMoves"},
+    {MOVE_SHEER_COLD, EventAddSheerCold, "Moves/ExtraMoves"},
 
 
     {MOVE_PSYCHIC_TERRAIN, EventAddPsychicTerrain, "Moves/PsychicTerrain"},
@@ -6236,7 +6249,6 @@ MoveEventAddTableExt moveEventAddTableExt[] = {
 
 struct PosEffectEventAddTableExt
 {
-    {MOVE_SHEER_COLD, EventAddSheerCold, "Moves/ExtraMoves"},
     POS_EFFECT posEffect;
     PosEffectEventAddFunc func;
     const char* dllName;
