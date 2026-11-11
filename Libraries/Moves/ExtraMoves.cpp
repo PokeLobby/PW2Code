@@ -25,6 +25,8 @@
 //  788 Fuerza G (Grav Apple)              +50 % con Gravedad
 //  801 Moluscanon (Shell Side Arm)     fisico si el Ataque supera al At. Esp. (aproximado)
 //  892 Electropalmas (Double Shock) esta en RemoveType.cpp
+//  92  Toxico (Toxic)                     no falla si lo usa un tipo Veneno (Gen 6+, issue-82)
+//  282 Desarme (Knock Off)                x1,5 de potencia si el objetivo lleva un objeto que se le puede quitar (Gen 6+, issue-82)
 
 // ---------------- utilidades
 static b32 TargetHasActed(BattleMon* targetMon) {
@@ -304,6 +306,42 @@ BattleEventHandlerTableEntry ShellSideArmHandlers[]{
 extern "C" BattleEventHandlerTableEntry* EventAddShellSideArm(u32* handlerAmount) {
     *handlerAmount = ARRAY_COUNT(ShellSideArmHandlers);
     return ShellSideArmHandlers;
+}
+
+// ---------------- TOXIC (92): un usuario de tipo Veneno nunca falla
+extern "C" void HandlerToxicNeverMiss(BattleEventItem* item, ServerFlow* serverFlow, u32 pokemonSlot, u32* work) {
+    if (pokemonSlot == BattleEventVar_GetValue(VAR_ATTACKING_MON) &&
+        BattleMon_HasType(Handler_GetBattleMon(serverFlow, pokemonSlot), TYPE_POIS)) {
+        BattleEventVar_RewriteValue(VAR_GENERAL_USE_FLAG, 1);
+    }
+}
+BattleEventHandlerTableEntry ToxicHandlers[]{
+    {EVENT_BYPASS_ACCURACY_CHECK, HandlerToxicNeverMiss},
+};
+extern "C" BattleEventHandlerTableEntry* EventAddToxic(u32* handlerAmount) {
+    *handlerAmount = ARRAY_COUNT(ToxicHandlers);
+    return ToxicHandlers;
+}
+
+// ---------------- KNOCK OFF (282): la entrada de abajo es la de Desarme del juego (HandlerKnockOff, ESDB.yml) + x1,5 de potencia
+extern "C" void HandlerKnockOff(BattleEventItem* item, ServerFlow* serverFlow, u32 pokemonSlot, u32* work);
+extern "C" void HandlerKnockOffPower(BattleEventItem* item, ServerFlow* serverFlow, u32 pokemonSlot, u32* work) {
+    if (pokemonSlot == BattleEventVar_GetValue(VAR_ATTACKING_MON)) {
+        u32 defendingSlot = BattleEventVar_GetValue(VAR_DEFENDING_MON);
+        BattleMon* defendingMon = Handler_GetBattleMon(serverFlow, defendingSlot);
+        if (defendingMon && BattleMon_GetHeldItem(defendingMon) != ITEM_NULL &&
+            !HandlerCommon_CheckIfCanStealPokeItem(serverFlow, pokemonSlot, defendingSlot)) {
+            MulPower(3, 2);
+        }
+    }
+}
+BattleEventHandlerTableEntry KnockOffHandlers[]{
+    {EVENT_DAMAGE_PROCESSING_END_HIT_REAL, HandlerKnockOff},
+    {EVENT_MOVE_BASE_POWER, HandlerKnockOffPower},
+};
+extern "C" BattleEventHandlerTableEntry* EventAddKnockOffUpdated(u32* handlerAmount) {
+    *handlerAmount = ARRAY_COUNT(KnockOffHandlers);
+    return KnockOffHandlers;
 }
 
 #endif // EXPAND_MOVES

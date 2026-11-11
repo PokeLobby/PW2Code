@@ -6214,6 +6214,10 @@ MoveEventAddTableExt moveEventAddTableExt[] = {
     {MOVE_COMEUPPANCE, EventAddMetalBurst, nullptr},
     {MOVE_THUNDERCLAP, EventAddSuckerPunch, nullptr},
 
+    // Hack PokeLobby (issue-82, Gen 9)
+    {MOVE_TOXIC, EventAddToxic, "Moves/ExtraMoves"},
+    {MOVE_KNOCK_OFF, EventAddKnockOffUpdated, "Moves/ExtraMoves"},
+
 
     {MOVE_PSYCHIC_TERRAIN, EventAddPsychicTerrain, "Moves/PsychicTerrain"},
 

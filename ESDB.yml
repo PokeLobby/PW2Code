@@ -3943,6 +3943,9 @@ Symbols:
   - Name: HandlerExplosionEnd
     Segment: 0xA7
     Address: 0x21c7689
+  - Name: HandlerKnockOff
+    Segment: 0xA7
+    Address: 0x21c8c99
   - Name: HandlerTripleKickHitCount
     Segment: 0xA7
     Address: 0x21c8005
