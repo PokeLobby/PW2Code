@@ -237,3 +237,22 @@ FULL_COPY_BattleMon_GetConditionDamage_0x62:
     .size FULL_COPY_BattleMon_GetConditionDamage_0x62, . - FULL_COPY_BattleMon_GetConditionDamage_0x62
 
 #endif // GEN9_BURN_DAMAGE
+
+#if GEN9_PROTECT_CHAIN
+
+@ Tabla de HandlerProtectCheckFail (0x21c93dc): N de "exito 1 de cada N" segun usos seguidos (indices 0 a 9). Gen 5: 1,2,4,8,16,32,64,128,0,0.
+@ Gen 9: 1, 3, 9, 27, 81, 243 (el maximo de un byte; a partir de ahi se queda en 1/243)
+FULL_COPY_167_0x21D991A:
+    .byte 1
+    .byte 3
+    .byte 9
+    .byte 27
+    .byte 81
+    .byte 243
+    .byte 243
+    .byte 243
+    .byte 243
+    .byte 243
+    .size FULL_COPY_167_0x21D991A, . - FULL_COPY_167_0x21D991A
+
+#endif // GEN9_PROTECT_CHAIN

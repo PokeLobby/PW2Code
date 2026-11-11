@@ -29,6 +29,9 @@
 
 #define GEN6_CRIT 1
 
+// Hack PokeLobby (issue-82, Gen 9): Proteccion y similares en cadena: probabilidad 1/3 por uso consecutivo (Gen 5: 1/2)
+#define GEN9_PROTECT_CHAIN 1
+
 // Hack PokeLobby (issue-82, Gen 9): las gemas suben el dano x1,3 (Gen 5: x1,5)
 #define GEN9_GEM_BOOST 1
 
