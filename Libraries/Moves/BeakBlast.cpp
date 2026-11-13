@@ -27,7 +27,7 @@ extern "C" void HandlerPosBeakBlastReaction(BattleEventItem* item, ServerFlow* s
         HandlerParam_AddCondition* addCondition;
         addCondition = (HandlerParam_AddCondition*)BattleHandler_PushWork(serverFlow, EFFECT_ADD_CONDITION, defendingSlot);
         addCondition->condition = CONDITION_BURN;
-        addCondition->condData = Condition_MakeNull();
+        addCondition->condData = MakeBasicStatus(CONDITION_BURN);
         addCondition->almost = 0;
         addCondition->pokeID = attackingSlot;
         BattleHandler_PopWork(serverFlow, addCondition);
