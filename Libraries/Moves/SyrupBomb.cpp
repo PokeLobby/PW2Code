@@ -10,6 +10,14 @@
 // work[0] -> battle slot of the Pokemon covered in syrup
 // work[1] -> amount of times the Speed has been lowered
 extern "C" void HandlerPosSyrupBombTurnCheck(BattleEventItem* item, ServerFlow* serverFlow, u32 targetPos, u32* work) {
+    // Self cleaning (issue #93): the turn counter only advances for the covered Pokemon, so if it is gone
+    // the item would live (and block every new Syrup Bomb) forever.
+    if (Handler_PokePosToPokeID(serverFlow, targetPos) != work[0] ||
+        BattleMon_IsFainted(Handler_GetBattleMon(serverFlow, work[0]))) {
+        BattleEventItem_Remove(item);
+        return;
+    }
+
     u32 slot = BattleEventVar_GetValue(VAR_MON_ID);
     if (slot != work[0])
         return;

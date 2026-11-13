@@ -119,6 +119,16 @@ extern "C" BattleEventHandlerTableEntry* EventAddFairyLock(u32* handlerAmount) {
 // work[0] -> slot del Pokemon atrapado
 // work[1] -> slot del usuario
 extern "C" void HandlerPosOctolockTurnEnd(BattleEventItem* item, ServerFlow* serverFlow, u32 targetPos, u32* work) {
+    // Self cleaning (issue #93): the lock ends when the trapped Pokemon or the user is gone (fainted or out of
+    // its position). A stale item would live forever and block every new Octolock of the battle.
+    if (Handler_PokePosToPokeID(serverFlow, targetPos) != work[0] ||
+        BattleMon_IsFainted(Handler_GetBattleMon(serverFlow, work[0])) ||
+        !IsOnField(serverFlow, work[1]) ||
+        BattleMon_IsFainted(Handler_GetBattleMon(serverFlow, work[1]))) {
+        BattleEventItem_Remove(item);
+        return;
+    }
+
     u32 slot = BattleEventVar_GetValue(VAR_MON_ID);
     if (slot != work[0])
         return;

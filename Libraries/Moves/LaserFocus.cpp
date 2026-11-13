@@ -8,11 +8,18 @@
 
 // POS LASER FOCUS
 extern "C" void HandlerPosLaserFocus(BattleEventItem* item, ServerFlow* serverFlow, u32 targetPos, u32* work) {
-    if (BattleEventVar_GetValue(VAR_ATTACKING_MON) == Handler_PokePosToPokeID(serverFlow, targetPos)) {
+    // work[1] -> battle slot of the user (issue #93: it was "whoever is in the position", so a replacement
+    // that came in after the user left inherited the guaranteed critical hit)
+    if (BattleEventVar_GetValue(VAR_ATTACKING_MON) == work[1]) {
         BattleEventVar_RewriteValue(VAR_CRIT_STAGE, 4);
     }
 }
 extern "C" void HandlerPosTurnCheckDoneNext(BattleEventItem* item, ServerFlow* serverFlow, u32 targetPos, u32* work) {
+    if (Handler_PokePosToPokeID(serverFlow, targetPos) != work[1] ||
+        BattleMon_IsFainted(Handler_GetBattleMon(serverFlow, work[1]))) {
+        BattleEventItem_Remove(item);
+        return;
+    }
     if (BattleEventVar_GetValue(VAR_MON_ID) == BATTLE_MAX_SLOTS) {
         // We know the turn Laser Focus is used it will be 0,
         // thus being removed the next turn
@@ -41,7 +48,8 @@ extern "C" void HandlerLaserFocus(BattleEventItem* item, ServerFlow* serverFlow,
         addEffectPos->targetPos = Handler_PokeIDToPokePos(serverFlow, pokemonSlot);
         // Make sure to initialize work to 0, so the turn count works properly
         addEffectPos->workToCopy[0] = 0;
-        addEffectPos->workCount = 1;
+        addEffectPos->workToCopy[1] = pokemonSlot;
+        addEffectPos->workCount = 2;
         BattleHandler_PopWork(serverFlow, addEffectPos);
 
         HandlerParam_Message* message;

@@ -26,7 +26,16 @@ extern "C" void HandlerPosTarShotFainted(BattleEventItem* item, ServerFlow* serv
         BattleEventItem_Remove(item);
     }
 }
+// Self cleaning (issue #93, same as Salt Cure #92): the item must not outlive the tarred Pokemon, a stale one
+// blocks every new Tar Shot of the battle. Called once with VAR_MON_ID = 31 and then once per Pokemon on the field.
+extern "C" void HandlerPosTarShotTurnCheck(BattleEventItem* item, ServerFlow* serverFlow, u32 targetPos, u32* work) {
+    if (Handler_PokePosToPokeID(serverFlow, targetPos) != work[0] ||
+        BattleMon_IsFainted(Handler_GetBattleMon(serverFlow, work[0]))) {
+        BattleEventItem_Remove(item);
+    }
+}
 BattleEventHandlerTableEntry PosTarShotHandlers[]{
+    {EVENT_TURN_CHECK_END, HandlerPosTarShotTurnCheck},
     {EVENT_ATTACKER_POWER, HandlerPosTarShotPower},
     {EVENT_SWITCH_OUT_END, HandlerPosTarShotSwitchOut},
     {EVENT_NOTIFY_FAINTED, HandlerPosTarShotFainted},

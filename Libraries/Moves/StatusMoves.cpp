@@ -186,7 +186,16 @@ extern "C" void HandlerPosDragonCheerFainted(BattleEventItem* item, ServerFlow* 
         BattleEventItem_Remove(item);
     }
 }
+// Self cleaning (issue #93, same as Salt Cure #92): the item has no expiry, so it must not outlive the cheered
+// Pokemon or it blocks every new Dragon Cheer of the battle. Called with VAR_MON_ID = 31 and per Pokemon on the field.
+extern "C" void HandlerPosDragonCheerTurnCheck(BattleEventItem* item, ServerFlow* serverFlow, u32 targetPos, u32* work) {
+    if (Handler_PokePosToPokeID(serverFlow, targetPos) != work[0] ||
+        BattleMon_IsFainted(Handler_GetBattleMon(serverFlow, work[0]))) {
+        BattleEventItem_Remove(item);
+    }
+}
 BattleEventHandlerTableEntry PosDragonCheerHandlers[]{
+    {EVENT_TURN_CHECK_END, HandlerPosDragonCheerTurnCheck},
     {EVENT_CRITICAL_CHECK, HandlerPosDragonCheerCrit},
     {EVENT_SWITCH_OUT_END, HandlerPosDragonCheerSwitchOut},
     {EVENT_NOTIFY_FAINTED, HandlerPosDragonCheerFainted},

@@ -70,7 +70,8 @@ extern "C" void HandlerPowder(BattleEventItem* item, ServerFlow* serverFlow, u32
         HandlerParam_Message* message;
         message = (HandlerParam_Message*)BattleHandler_PushWork(serverFlow, EFFECT_MESSAGE, pokemonSlot);
         BattleHandler_StrSetup(&message->str, 2u, BATTLE_POWDER_MSGID);
-        BattleHandler_AddArg(&message->str, work[0]);
+        // issue #93: the arg was work[0] of the MOVE item (not the target), so the message named the wrong Pokemon
+        BattleHandler_AddArg(&message->str, BattleEventVar_GetValue(VAR_TARGET_MON_ID));
         BattleHandler_PopWork(serverFlow, message);
     }
 }
