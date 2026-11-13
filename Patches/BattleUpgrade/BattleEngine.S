@@ -10,6 +10,15 @@
 .type THUMB_BRANCH_LINK_BtlvEffect_LoadAnimationScript_0x1A, %function
 #endif
 
+@ El montón 0x12 del combate pasa de 128 KB a 256 KB (lsls r2, r4, #0x11 -> #0x12, r4 = 1).
+@ Con el código extra del hack, en los combates múltiples largos se quedaba troceado y
+@ GFL_HeapAllocate acababa en el error fatal al cargar el gráfico de un Pokémon que entra
+@ (23.988 bytes de /a/1/6/9). El montón padre (0x1) tiene más de 500 KB libres en combate.
+@ PokeLobbyLauncher#102.
+FULL_COPY_BattleProc_Init_0x26:
+    .hword  0x04A2          @ lsls r2, r4, #0x12
+    .size FULL_COPY_BattleProc_Init_0x26, . - FULL_COPY_BattleProc_Init_0x26
+
 #if WEATHER_ABILITY_TURNS != 255
 
 @ This changes the amount of turns weather will last after being summoned by an ability

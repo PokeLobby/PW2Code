@@ -46,6 +46,9 @@ Segments:
     Type: OVERLAY
 
 Symbols:
+  - Name: BattleProc_Init
+    Segment: 0xA7
+    Address: 0x2199901
   - Name: BoxView_PrintAbilityName
     Segment: 0xFF
     Address: 0x21ce62d
