@@ -10,13 +10,21 @@
 // POS SALT CURE
 // work[0] -> battle slot of the salt cured Pokemon
 extern "C" void HandlerPosSaltCureTurnCheck(BattleEventItem* item, ServerFlow* serverFlow, u32 targetPos, u32* work) {
+    // Self cleaning (issue #92): if the salted Pokemon is gone from its position (fainted or switched out) the
+    // item must not survive. A stale item blocks every new Salt Cure of the battle (PosEffectEvent_CanEffectBeRegistered
+    // only looks at the effect id). This event is called once with VAR_MON_ID = 31 and then once per Pokemon on the
+    // field, so the check goes before the VAR_MON_ID comparison and does not depend on it.
+    if (Handler_PokePosToPokeID(serverFlow, targetPos) != work[0] ||
+        BattleMon_IsFainted(Handler_GetBattleMon(serverFlow, work[0]))) {
+        BattleEventItem_Remove(item);
+        return;
+    }
+
     u32 slot = BattleEventVar_GetValue(VAR_MON_ID);
     if (slot != work[0])
         return;
 
     BattleMon* currentMon = Handler_GetBattleMon(serverFlow, slot);
-    if (BattleMon_IsFainted(currentMon))
-        return;
     if (BattleMon_GetValue(currentMon, VALUE_EFFECTIVE_ABILITY) == ABIL_MAGIC_GUARD)
         return;
 
