@@ -41,8 +41,17 @@ Segments:
   - ID: 0xA9
     Name: 169
     Type: OVERLAY
+  - ID: 0xFF
+    Name: 255
+    Type: OVERLAY
 
 Symbols:
+  - Name: BoxView_PrintAbilityName
+    Segment: 0xFF
+    Address: 0x21ce62d
+  - Name: GFL_WordSetRegisterAbilityName
+    Segment: 0x0
+    Address: 0x202452d
   - Name: g_GameBeaconSys
     Segment: 0x1
     Address: 0x2141840
