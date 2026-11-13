@@ -2905,7 +2905,7 @@ extern "C" void THUMB_BRANCH_ServerControl_SideEffectEndMessageCore(ServerFlow* 
         return;  
     }
 
-    ServerDisplay_AddMessageImpl(serverFlow->serverCommandQueue, SCID_MessageStandard, msgID, side);
+    ServerDisplay_AddMessageImpl(serverFlow->serverCommandQueue, SCID_MessageStandard, msgID, side, 0xFFFF0000);
 }
 
 #endif // EXPAND_FIELD_EFFECTS
