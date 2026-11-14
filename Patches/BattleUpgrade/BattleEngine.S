@@ -249,15 +249,38 @@ FULL_COPY_BattleMon_GetConditionDamage_0x62:
 
 #if GEN9_BIND_DAMAGE
 
-@ Condition_BindSetup (overlay 169): al atrapar se calcula el dano por turno y se guarda en el estado.
-@ Con la marca de la Banda Atadura dividia los PS maximos entre 8 y sin ella entre 16; ahora entre 6 y entre 8.
-FULL_COPY_Condition_BindSetup_0x8E:
-    movs    r1, #6
-    .size FULL_COPY_Condition_BindSetup_0x8E, . - FULL_COPY_Condition_BindSetup_0x8E
-
-FULL_COPY_Condition_BindSetup_0x94:
+@ Dano de los ataques que atrapan (PokeLobbyLauncher#112), 1/8 y 1/6 con Banda Atadura (Gen 5: 1/16 y 1/8).
+@ Lo calcula Condition_BindSetup (overlay 169) llamando a DivideMaxHPZeroCheck; los FULL_COPY del overlay 169 no se
+@ aplican (se carga en 0x0689xxxx por otro camino), asi que se sustituye DivideMaxHPZeroCheck: igual que la original
+@ (PS maximos / divisor, minimo 1, con DivideMaxHp) salvo que la llame Condition_BindSetup, que cambia el divisor.
+@ El salto de PW2Code al principio de la funcion es "push {lr}; bl aqui; pop {pc}", asi que la vuelta del que
+@ llamo esta en la pila: [sp] al entrar, [sp, #8] tras el push de aqui. El .balign hace falta: la tabla de .byte de
+@ arriba deja la seccion en direccion impar y el codigo Thumb quedaba desalineado (el juego se colgaba).
+.balign 4
+.type THUMB_BRANCH_DivideMaxHPZeroCheck, %function
+THUMB_BRANCH_DivideMaxHPZeroCheck:
+    push    {r4, lr}
+    ldr     r2, [sp, #8]
+    ldr     r3, =0x689BE5B      @ vuelta a Condition_BindSetup (Thumb)
+    cmp     r2, r3
+    bne     1f
+    cmp     r1, #16
+    bne     2f
     movs    r1, #8
-    .size FULL_COPY_Condition_BindSetup_0x94, . - FULL_COPY_Condition_BindSetup_0x94
+    b       1f
+2:
+    cmp     r1, #8
+    bne     1f
+    movs    r1, #6
+1:
+    bl      DivideMaxHp
+    cmp     r0, #0
+    bne     3f
+    movs    r0, #1
+3:
+    pop     {r4, pc}
+    .pool
+    .size THUMB_BRANCH_DivideMaxHPZeroCheck, . - THUMB_BRANCH_DivideMaxHPZeroCheck
 
 #endif // GEN9_BIND_DAMAGE
 

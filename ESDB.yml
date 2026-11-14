@@ -553,6 +553,9 @@ Symbols:
   - Name: BattleMon_IsFullHP
     Segment: 0xA7
     Address: 0x21bb389
+  - Name: DivideMaxHp
+    Segment: 0xA7
+    Address: 0x21bd3b5
   - Name: DivideMaxHPZeroCheck
     Segment: 0xA7
     Address: 0x21bd3c9
