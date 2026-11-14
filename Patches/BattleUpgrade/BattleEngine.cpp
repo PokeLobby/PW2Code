@@ -6142,6 +6142,9 @@ MoveEventAddTableExt moveEventAddTableExt[] = {
     {MOVE_ELECTRIC_TERRAIN, EventAddElectricTerrain, "Moves/ElectricTerrain"},
     {MOVE_HOLD_BACK, EventAddFalseSwipe, nullptr},
     {MOVE_INFESTATION, EventAddBind, nullptr},
+    // Cepo y Electrojaula atrapan como Atadura: necesitan el manejador de Atadura del juego (auditar.py, #22)
+    {MOVE_SNAP_TRAP, EventAddBind, nullptr},
+    {MOVE_THUNDER_CAGE, EventAddBind, nullptr},
     {MOVE_THOUSAND_ARROWS, EventAddThousandArrows, "Moves/ThousandArrows"},
     {MOVE_THOUSAND_WAVES, EventAddTrapHit, "Moves/TrapHit"},
     {MOVE_HYPERSPACE_FURY, EventAddHyperspaceFury, "Moves/HyperspaceFury"},
