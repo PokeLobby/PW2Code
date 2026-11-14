@@ -3850,6 +3850,15 @@ Symbols:
   - Name: CalcWeatherDamage
     Segment: 0xA7
     Address: 0x21bd429
+  - Name: HandlerFeintBreakProtect
+    Segment: 0xA7
+    Address: 0x21c9a99
+  - Name: HandlerFeintTextSet
+    Segment: 0xA7
+    Address: 0x21c9ab1
+  - Name: HandlerFeintResetProtectCounter
+    Segment: 0xA7
+    Address: 0x21c9b29
   - Name: EventAddPayDay
     Segment: 0xA7
     Address: 0x21c78a9
