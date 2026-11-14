@@ -32,6 +32,32 @@ extern "C" void CommonEmergencyExitCheck(ServerFlow * serverFlow, u32 currentSlo
 
     BattleField_SetSubstituteDamage(currentSlot, 0);
 }
+// Huida/Retirada: con relevo cambia; sin relevo, en combate salvaje el combate termina (el salvaje huye,
+// o el jugador huye si no le quedan Pokemon); contra entrenador sin relevo no hace nada ni muestra aviso.
+// Devuelve true si actuo. requireReserved: comprobacion extra de cambio ya reservado (solo fin de turno).
+static bool EmergencyExitAct(ServerFlow* serverFlow, u32 pokemonSlot, bool requireReserved) {
+    if (Handler_GetFightEnableBenchPokeNum(serverFlow, pokemonSlot)) {
+        if (requireReserved && !Handler_CheckReservedMemberChangeAction(serverFlow)) return false;
+
+        BattleHandler_PushRun(serverFlow, EFFECT_ABILITY_POPUP_ADD, pokemonSlot);
+
+        HandlerParam_Switch* switchOut;
+        switchOut = (HandlerParam_Switch*)BattleHandler_PushWork(serverFlow, EFFECT_SWITCH, pokemonSlot);
+        switchOut->pokeID = pokemonSlot;
+        BattleHandler_PopWork(serverFlow, switchOut);
+
+        BattleHandler_PushRun(serverFlow, EFFECT_ABILITY_POPUP_REMOVE, pokemonSlot);
+        return true;
+    }
+    if (MainModule_GetBattleType(serverFlow->mainModule) == BtlType_Wild) {
+        // Igual que Teletransporte: EFFECT_QUIT_BATTLE termina el combate (escape forzado)
+        BattleHandler_PushRun(serverFlow, EFFECT_ABILITY_POPUP_ADD, pokemonSlot);
+        BattleHandler_PushRun(serverFlow, EFFECT_QUIT_BATTLE, pokemonSlot);
+        BattleHandler_PushRun(serverFlow, EFFECT_ABILITY_POPUP_REMOVE, pokemonSlot);
+        return true;
+    }
+    return false;
+}
 extern "C" void HandlerEmergencyExitDamageCheck(BattleEventItem* item, ServerFlow* serverFlow, u32 pokemonSlot, u32* work) {
     u32 targetCount = BattleEventVar_GetValue(VAR_TARGET_COUNT);
     for (u32 target = 0; target < targetCount; ++target) {
@@ -45,14 +71,7 @@ extern "C" void HandlerEmergencyExitDamageCheck(BattleEventItem* item, ServerFlo
 #if EMERGENCY_EXIT_DEBUG
                 DPRINTF("EE SWITCH -> SLOT: %d\n", pokemonSlot);
 #endif
-                BattleHandler_PushRun(serverFlow, EFFECT_ABILITY_POPUP_ADD, pokemonSlot);
-
-                HandlerParam_Switch* switchOut;
-                switchOut = (HandlerParam_Switch*)BattleHandler_PushWork(serverFlow, EFFECT_SWITCH, pokemonSlot);
-                switchOut->pokeID = pokemonSlot;
-                BattleHandler_PopWork(serverFlow, switchOut);
-
-                BattleHandler_PushRun(serverFlow, EFFECT_ABILITY_POPUP_REMOVE, pokemonSlot);
+                EmergencyExitAct(serverFlow, pokemonSlot, false);
             }
         }
     }
@@ -73,20 +92,9 @@ extern "C" void HandlerEmergencyExitSwitchEnd(BattleEventItem* item, ServerFlow*
 #if EMERGENCY_EXIT_DEBUG
         DPRINTF("EE SWITCH END -> SLOT: %d\n", pokemonSlot);
 #endif
-        if (Handler_GetFightEnableBenchPokeNum(serverFlow, pokemonSlot)
-            && Handler_CheckReservedMemberChangeAction(serverFlow)) {
-
-            BattleHandler_PushRun(serverFlow, EFFECT_ABILITY_POPUP_ADD, pokemonSlot);
-
-            HandlerParam_Switch* switchOut;
-            switchOut = (HandlerParam_Switch*)BattleHandler_PushWork(serverFlow, EFFECT_SWITCH, pokemonSlot);
-            switchOut->pokeID = pokemonSlot;
-            BattleHandler_PopWork(serverFlow, switchOut);
-
-            BattleHandler_PushRun(serverFlow, EFFECT_ABILITY_POPUP_REMOVE, pokemonSlot);
-
+        if (EmergencyExitAct(serverFlow, pokemonSlot, true)) {
             // Set the flag to switch after a turn has ended
-            SetEndTurnSwitchFlag();
+            if (Handler_GetFightEnableBenchPokeNum(serverFlow, pokemonSlot)) SetEndTurnSwitchFlag();
         }
     }
 }
