@@ -9,18 +9,19 @@
 extern "C" void HandlerParentalBondPower(BattleEventItem * item, ServerFlow * serverFlow, u32 pokemonSlot, u32 * work) {
     if (pokemonSlot == BattleEventVar_GetValue(VAR_ATTACKING_MON) && BattleField_CheckParentalBondFlag()) {
         *work += 1;
-        u32 power = BattleEventVar_GetValue(VAR_MOVE_POWER);
 
         if (*work == 2) {
             *work = 0;
+            // Multiplicador en vez de reescribir la potencia: los ataques que calculan su potencia en este mismo
+            // evento (Poder Oculto, Retribucion, Giro Bola, Patada Baja...) la volvian a escribir completa y el
+            // segundo golpe pegaba entero (PokeLobbyLauncher#108). El multiplicador se aplica al final, como el
+            // de las demas habilidades (Megadisparador, Piel Feerica...).
 #if GEN6_PARENTAL_BOND
-            power /= 2;
+            BattleEventVar_MulValue(VAR_MOVE_POWER_RATIO, 2048);
 #else
-            power /= 4;
+            BattleEventVar_MulValue(VAR_MOVE_POWER_RATIO, 1024);
 #endif
         }
-
-        BattleEventVar_RewriteValue(VAR_MOVE_POWER, power);
     }
 }
 BattleEventHandlerTableEntry ParentalBondHandlers[]{
