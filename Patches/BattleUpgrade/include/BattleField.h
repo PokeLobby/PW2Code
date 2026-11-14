@@ -83,6 +83,9 @@ struct BattleFieldExt
 
     // Each bit represents a battle slot, 1 means the mon has already used Supersweet Syrup
     u32 supersweetSyrupFlag;
+
+    // Hack PokeLobby: each bit represents a battle slot, 1 means the mon has already used Embody Aspect this battle
+    u32 embodyAspectFlag;
 #endif // EXPAND_ABILITIES
 
 #if EXPAND_ITEMS
@@ -176,6 +179,9 @@ extern "C" void BattleField_SetIntrepidSwordFlag(u32 battleSlot);
 extern "C" b32 BattleField_CheckDauntlessShieldFlag(u32 battleSlot);
 extern "C" void BattleField_SetDauntlessShieldFlag(u32 battleSlot);
 #endif
+
+extern "C" b32 BattleField_CheckEmbodyAspectFlag(u32 battleSlot);
+extern "C" void BattleField_SetEmbodyAspectFlag(u32 battleSlot);
 
 extern "C" u32 BattleField_GetNeutralizingGasMons();
 extern "C" void BattleField_AddNeutralizingGasMon();
