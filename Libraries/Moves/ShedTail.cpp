@@ -54,8 +54,9 @@ extern "C" void HandlerShedTailCheckFail(BattleEventItem* item, ServerFlow* serv
         u32 maxHP = BattleMon_GetValue(currentMon, VALUE_MAX_HP);
         u32 currentHP = BattleMon_GetValue(currentMon, VALUE_CURRENT_HP);
 
-        // Needs more than half of the HP, no substitute and somebody to switch to
-        if (currentHP * 2 <= maxHP ||
+        // The cost is half of the max HP rounded up: the user needs MORE HP than the cost (never faints),
+        // no substitute and somebody to switch to
+        if (currentHP <= (maxHP + 1) / 2 ||
             BattleMon_IsSubstituteActive(currentMon) ||
             !Handler_GetFightEnableBenchPokeNum(serverFlow, pokemonSlot)) {
             BattleEventVar_RewriteValue(VAR_FAIL_CAUSE, MOVEFAIL_OTHER);
@@ -72,11 +73,11 @@ extern "C" void HandlerShedTail(BattleEventItem* item, ServerFlow* serverFlow, u
         BattleHandler_AddArg(&message->str, pokemonSlot);
         BattleHandler_PopWork(serverFlow, message);
 
-        // The user loses half of its max HP
+        // The user loses half of its max HP, rounded up (same formula as the check above)
         HandlerParam_Damage* damage;
         damage = (HandlerParam_Damage*)BattleHandler_PushWork(serverFlow, EFFECT_DAMAGE, pokemonSlot);
         damage->pokeID = pokemonSlot;
-        damage->damage = DivideMaxHPZeroCheck(currentMon, 2u);
+        damage->damage = (BattleMon_GetValue(currentMon, VALUE_MAX_HP) + 1) / 2;
         BattleHandler_PopWork(serverFlow, damage);
 
         // The substitute has a quarter of the max HP and goes to the next Pokemon
