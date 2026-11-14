@@ -157,6 +157,9 @@ Symbols:
   - Name: GFL_HeapFree
     Segment: 0x0
     Address: 0x203a279
+  - Name: TextPrinter_Update
+    Segment: 0x0
+    Address: 0x2022491
   - Name: GFL_MsgDataLoadStrbuf
     Segment: 0x0
     Address: 0x2048865
