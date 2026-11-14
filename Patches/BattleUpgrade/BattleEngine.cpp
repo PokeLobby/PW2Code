@@ -4124,7 +4124,11 @@ extern "C" b32 ParentalBondCheck(ServerFlow* serverFlow, MOVE_ID moveID, BattleM
     // Only when targeting 1 Pokémon will Parental Bond work
     if (targetCount && targetCount == 1) {
 
-        MoveParam* moveParam;
+        // Antes era un puntero sin inicializar: el juego escribia los datos del ataque donde apuntase la
+        // basura del registro y petaba (o machacaba memoria) cada vez que atacaba un Pokemon con Amor Filial.
+        // PokeLobbyLauncher#107.
+        MoveParam moveParamData;
+        MoveParam* moveParam = &moveParamData;
         ServerEvent_GetMoveParam(serverFlow, moveID, attackingMon, moveParam);
         // Self-targeting and side moves don't work
         if (moveParam->targetType == TARGET_USER ||
