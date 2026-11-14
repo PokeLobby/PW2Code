@@ -56,6 +56,10 @@
 #define WEATHER_ABILITY_TURNS 5 // 255 means infinite turns
 
 #define SNOW_WEATHER 1
+// PokeLocke: el granizo sigue haciendo 1/16 por turno (decision de Poxi, 2026-11-14); 1 = nieve sin dano como en Gen 9
+#define SNOW_NO_DAMAGE 0
+// PokeLocke: drenar con cualquier categoria de ataque (Canon Batidor)
+#define DRAIN_ANY_CATEGORY 1
 
 #define GRASS_IMMUNE_TO_POWDER 1
 #define ELECTRIC_IMMUNE_TO_PARALYSIS 1

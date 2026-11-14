@@ -36,15 +36,37 @@ FULL_COPY_BattleHandler_RemoveSideEffectCore_0x58:
  
 #endif // EXPAND_FIELD_EFFECTS
 
-#if SNOW_WEATHER
+#if SNOW_WEATHER && SNOW_NO_DAMAGE
 
 @ This prevents any Pokemon from taking hail/snow damage
-FULL_COPY_CalcWeatherDamage_0xE:
+@ El original estaba en +0xE, que es la comprobacion de tipo Roca de la TORMENTA DE ARENA (tiempo 4): la arena dejaba
+@ de hacer dano a todos y el granizo seguia haciendolo. La del granizo (tiempo 3, tipo Hielo) es la de +0x3C.
+FULL_COPY_CalcWeatherDamage_0x3C:
     nop
     movs    r0, #1
-    .size FULL_COPY_CalcWeatherDamage_0xE, . - FULL_COPY_CalcWeatherDamage_0xE
+    .size FULL_COPY_CalcWeatherDamage_0x3C, . - FULL_COPY_CalcWeatherDamage_0x3C
 
-#endif // SNOW_WEATHER
+#endif // SNOW_WEATHER && SNOW_NO_DAMAGE
+
+#if DRAIN_ANY_CATEGORY
+
+@ ServerControl_DamageDrain (0x21A58AC) solo drenaba si la categoria del ataque era 8 (dano + absorber). Canon Batidor
+@ (902) es dano + estado (quema) con 50 de drenaje y no curaba. Ahora drena cualquier ataque con drenaje (parametro 25)
+@ mayor que 0; los de retroceso lo tienen negativo. Era el unico ataque con drenaje fuera de la categoria 8.
+@ Antes: bl PML_MoveGetCategory; cmp r0,#8; bne fin; ldrh r0,[r4]; movs r1,#25; bl PML_MoveGetParam; adds r1,r0,#0; ldr r0,[sp,#24]
+FULL_COPY_167_0x21A58B8:
+    .hword 0x2119           @ movs r1, #25            (r0 = ataque, cargado en 0x21A58B2)
+    .hword 0xF67B, 0xFCF7   @ bl   0x20212AC          (PML_MoveGetParam)
+    .hword 0x0600           @ lsls r0, r0, #24
+    .hword 0x1600           @ asrs r0, r0, #24        (con signo)
+    .hword 0x2800           @ cmp  r0, #0
+    .hword 0xDD13           @ ble  0x21A58EE          (sin drenaje: fin)
+    .hword 0x1C01           @ adds r1, r0, #0
+    .hword 0x9806           @ ldr  r0, [sp, #24]
+    .hword 0x46C0           @ nop                     (sigue en 0x21A58CC: bl del calculo de lo drenado)
+    .size FULL_COPY_167_0x21A58B8, . - FULL_COPY_167_0x21A58B8
+
+#endif // DRAIN_ANY_CATEGORY
 
 #if EXPAND_ABILITIES || ADD_MEGA_EVOLUTION
 
