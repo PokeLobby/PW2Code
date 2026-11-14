@@ -6497,11 +6497,13 @@ extern "C" EFFECTIVENESS THUMB_BRANCH_LINK_ServerEvent_CheckMoveDamageEffectiven
 }
 
 // Trick-or-Treat & Forest's Curse - Fix message for triple weakness/resistance with extra type
+// PokeLocke: el final de los ataques de varios golpes llama aqui siempre, tambien con eficacia neutra (la original
+// no ponia nada en ese caso). Sin el "else if" salia "Es muy eficaz" en cualquier ataque multigolpe neutro.
 extern "C" void THUMB_BRANCH_ServerDisplay_DamageEffectiveness(ServerFlow* serverFlow, EFFECTIVENESS effectiveness) {
     if (effectiveness < EFFECTIVENESS_1 || effectiveness == EFFECTIVENESS_1_8) {
         ServerDisplay_AddMessageImpl(serverFlow->serverCommandQueue, SCID_MessageStandard, 79, 0xFFFF0000);
     }
-    else {
+    else if (effectiveness != EFFECTIVENESS_1) {
         ServerDisplay_AddMessageImpl(serverFlow->serverCommandQueue, SCID_MessageStandard, 78, 0xFFFF0000);
     }
 }
