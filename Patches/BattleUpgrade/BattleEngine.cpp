@@ -6228,6 +6228,8 @@ MoveEventAddTableExt moveEventAddTableExt[] = {
     {MOVE_DRAGON_ENERGY, EventAddEruption, nullptr},
     {MOVE_TEMPER_FLARE, EventAddStompingTantrum, "Moves/StompingTantrum"},
     {MOVE_SUPERCELL_SLAM, EventAddHiJumpKick, nullptr},
+    // Patada Hacha: si falla, el usuario pierde la mitad de sus PS maximos, como Patada Salto Alta
+    {MOVE_AXE_KICK, EventAddHiJumpKick, nullptr},
     // Lote 4b (C con reglas propias)
     {MOVE_TRIPLE_AXEL, EventAddTripleAxel, "Moves/ExtraMoves"},
     {MOVE_POPULATION_BOMB, EventAddPopulationBomb, "Moves/ExtraMoves"},
