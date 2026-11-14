@@ -247,6 +247,20 @@ FULL_COPY_BattleMon_GetConditionDamage_0x62:
 
 #endif // GEN9_BURN_DAMAGE
 
+#if GEN9_BIND_DAMAGE
+
+@ Condition_BindSetup (overlay 169): al atrapar se calcula el dano por turno y se guarda en el estado.
+@ Con la marca de la Banda Atadura dividia los PS maximos entre 8 y sin ella entre 16; ahora entre 6 y entre 8.
+FULL_COPY_Condition_BindSetup_0x8E:
+    movs    r1, #6
+    .size FULL_COPY_Condition_BindSetup_0x8E, . - FULL_COPY_Condition_BindSetup_0x8E
+
+FULL_COPY_Condition_BindSetup_0x94:
+    movs    r1, #8
+    .size FULL_COPY_Condition_BindSetup_0x94, . - FULL_COPY_Condition_BindSetup_0x94
+
+#endif // GEN9_BIND_DAMAGE
+
 #if GEN9_PROTECT_CHAIN
 
 @ Tabla de HandlerProtectCheckFail (0x21c93dc): N de "exito 1 de cada N" segun usos seguidos (indices 0 a 9). Gen 5: 1,2,4,8,16,32,64,128,0,0.

@@ -40,6 +40,9 @@
 
 // Hack PokeLobby (issue-82, Gen 9): la quemadura quita 1/16 de los PS maximos por turno (Gen 5: 1/8)
 #define GEN9_BURN_DAMAGE 1
+// Ataques que atrapan (Atadura, Torbellino, Acoso...): 1/8 de los PS maximos por turno y 1/6 con Banda Atadura,
+// como desde la 6.a gen. (Gen 5: 1/16 y 1/8). PokeLobbyLauncher#112.
+#define GEN9_BIND_DAMAGE 1
 
 // Hack PokeLobby (issue-82, Gen 9): la paralisis reduce la Velocidad a la mitad (Gen 5: a un cuarto)
 #define GEN9_PARALYSIS_SPEED 1
