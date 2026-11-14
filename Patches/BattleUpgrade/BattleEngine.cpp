@@ -1345,6 +1345,13 @@ extern "C" void BattleField_SetDauntlessShieldFlag(u32 battleSlot) {
 }
 #endif
 
+extern "C" b32 BattleField_CheckEmbodyAspectFlag(u32 battleSlot) {
+    return (g_BattleField->embodyAspectFlag >> battleSlot) & 1;
+}
+extern "C" void BattleField_SetEmbodyAspectFlag(u32 battleSlot) {
+    g_BattleField->embodyAspectFlag |= (1 << battleSlot);
+}
+
 extern "C" u32 BattleField_GetNeutralizingGasMons() {
     return g_BattleField->neutralizingGasMons;
 }
@@ -1825,6 +1832,8 @@ extern "C" void THUMB_BRANCH_BattleField_InitCore(BattleFieldExt * battleField, 
 #if GEN9_DAUNTLESS_SHIELD
     battleField->dauntlessShieldFlag = 0;
 #endif
+
+    battleField->embodyAspectFlag = 0;
 
     battleField->neutralizingGasMons = 0;
 
