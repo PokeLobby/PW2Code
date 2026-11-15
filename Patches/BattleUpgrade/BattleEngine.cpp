@@ -3147,6 +3147,12 @@ extern "C" u32 THUMB_BRANCH_SAFESTACK_ServerEvent_CalcDamage(ServerFlow * server
         int damageRatio = BattleEventVar_GetValue(VAR_RATIO);
         int damageAfterProc2 = BattleEventVar_GetValue(VAR_DAMAGE);
         finalDamage = fixed_round(damageAfterProc2, damageRatio);
+        // Hack PokeLobby: el minimo de 1 PS va tambien despues de los modificadores
+        // finales (Multiescamas, Guardia Espectro...). Si no, un golpe de 1 PS a mitad
+        // de dano se redondeaba a 0, y en los juegos oficiales siempre quita al menos 1.
+        if (!finalDamage) {
+            finalDamage = 1;
+        }
     }
 #if EXPAND_MOVES
     // Hack PokeLobby (lote 4): Asalto Espadon, el usuario recibe el doble de dano
