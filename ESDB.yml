@@ -3985,3 +3985,12 @@ Symbols:
   - Name: ServerEvent_CheckOHKOHit
     Segment: 0xA7
     Address: 0x21aa5f5
+  - Name: PrintStream_Update
+    Segment: 0x0
+    Address: 0x2022491
+  - Name: PrintStream_ProcessControlCode
+    Segment: 0x0
+    Address: 0x20226c1
+  - Name: BmpWin_FlushChar
+    Segment: 0x0
+    Address: 0x2048271
