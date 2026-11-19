@@ -130,7 +130,16 @@ extern "C" void HandlerGrassyTerrainHeal(BattleEventItem * a1, ServerFlow * serv
     }
 
     u32 currentSlot = BattleEventVar_GetValue(VAR_MON_ID);
+    // Hack PokeLobby: el evento llega también para un hueco vacío (31) cuando un Pokémon se ha
+    // debilitado y aún no ha salido el siguiente; su BattleMon es basura y el juego se colgaba al
+    // curarlo (Reuniclus del barco Plasma, partida de Nakama37). Tampoco se cura a un debilitado.
+    if (currentSlot >= BATTLE_MAX_SLOTS) {
+        return;
+    }
     BattleMon* currentMon = Handler_GetBattleMon(serverFlow, currentSlot);
+    if (BattleMon_IsFainted(currentMon)) {
+        return;
+    }
     if (!ServerControl_CheckFloating(serverFlow, currentMon, 1)) {
         if (!BattleMon_IsFullHP(currentMon)) {
             HandlerParam_RecoverHP* recoveHP;
