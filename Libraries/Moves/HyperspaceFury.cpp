@@ -22,7 +22,8 @@ extern "C" void HandlerHyperspaceFuryFail(BattleEventItem* item, ServerFlow* ser
 }
 
 BattleEventHandlerTableEntry HyperspaceFuryHandlers[] {
-    {EVENT_MOVE_EXECUTE_CHECK2, HandlerHyperspaceFuryFail},
+    // Hack PokeLobby (streamers-serie-2#24): la comprobacion de Hoopa estaba al reves (fallaba
+    // con cualquier Pokemon en forma 1, Hoopa Desatado incluido). Decision de Poxi: la usa cualquiera.
     {EVENT_CHECK_PROTECT_BREAK, HandlerFeintBreakProtect},
     {EVENT_DETERMINE_MOVE_DAMAGE, HandlerFeintTextSet},
     {EVENT_BREAK_OPPONENT_GUARD, HandlerFeintResetProtectCounter},

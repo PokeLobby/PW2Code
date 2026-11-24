@@ -2,6 +2,7 @@
 #if EXPAND_ABILITIES
 
 #include "Patches/BattleUpgrade/BattleEngine.h"
+#include "Patches/BattleUpgrade/include/FieldEffectExpansion.h"
 
 #include "server_flow.h"
 
@@ -15,10 +16,14 @@ extern "C" void HandlerTeraformZero(BattleEventItem * item, ServerFlow * serverF
         changeWeather->weather = WEATHER_NULL;
         BattleHandler_PopWork(serverFlow, changeWeather);
 
+        b32 habiaCampo = ServerEvent_GetTerrain(serverFlow) != TERRAIN_NULL;
         HandlerParam_AddFieldEffect* addFieldEffect;
         addFieldEffect = (HandlerParam_AddFieldEffect*)BattleHandler_PushWork(serverFlow, EFFECT_REMOVE_FIELD_EFFECT, pokemonSlot);
         addFieldEffect->effect = FLDEFF_TERRAIN;
         BattleHandler_PopWork(serverFlow, addFieldEffect);
+        // Como al acabarse los turnos: Mimetismo, Carga Cuantica... se enteran (streamers-serie-2#24)
+        if (habiaCampo)
+            ServerEvent_ChangeTerrain(serverFlow, TERRAIN_NULL);
 
         BattleHandler_PushRun(serverFlow, EFFECT_ABILITY_POPUP_REMOVE, pokemonSlot);
     }

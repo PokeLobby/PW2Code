@@ -1997,6 +1997,12 @@ extern "C" b32 THUMB_BRANCH_BattleField_RemoveEffectCore(BattleFieldExt * battle
     }
 
     BattleField_ClearFactorWork(battleField, fieldEffect);
+    // Hack PokeLobby (streamers-serie-2#24): quitar el campo con un ataque
+    // (Allanador Ferreo, Giro Helado...) no pasaba por BattleField_EndTerrain y
+    // el campo seguia activo sin contar turnos.
+    if (fieldEffect == FLDEFF_TERRAIN) {
+        BattleField_EndTerrain(battleField);
+    }
     return 1;
 }
 
@@ -2138,6 +2144,13 @@ extern "C" b32 THUMB_BRANCH_BattleHandler_AddFieldEffect(ServerFlow * serverFlow
     if (!prevTerrain && !ServerControl_FieldEffectCore(serverFlow, params->effect, params->condData, params->addDependPoke))
     {
         return 0;
+    }
+
+    // Hack PokeLobby (streamers-serie-2#24): un campo que sustituye a otro
+    // empieza con sus turnos enteros, no con los que le quedaban al anterior.
+    if (prevTerrain && params->effect == FLDEFF_TERRAIN) {
+        g_BattleField->conditionData[FLDEFF_TERRAIN] = params->condData;
+        g_BattleField->turnCount[FLDEFF_TERRAIN] = 0;
     }
 
     if ((params->header.flags & HANDLER_ABILITY_POPUP_FLAG) != 0) {
