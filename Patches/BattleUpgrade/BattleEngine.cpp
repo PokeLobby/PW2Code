@@ -2146,6 +2146,13 @@ extern "C" b32 THUMB_BRANCH_BattleHandler_AddFieldEffect(ServerFlow * serverFlow
         return 0;
     }
 
+    // Hack PokeLobby (streamers-serie-2#24): un campo que sustituye a otro
+    // empieza con sus turnos enteros, no con los que le quedaban al anterior.
+    if (prevTerrain && params->effect == FLDEFF_TERRAIN) {
+        g_BattleField->conditionData[FLDEFF_TERRAIN] = params->condData;
+        g_BattleField->turnCount[FLDEFF_TERRAIN] = 0;
+    }
+
     if ((params->header.flags & HANDLER_ABILITY_POPUP_FLAG) != 0) {
         ServerDisplay_AbilityPopupAdd(serverFlow, currentMon);
     }
