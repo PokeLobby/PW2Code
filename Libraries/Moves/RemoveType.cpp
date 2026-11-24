@@ -37,7 +37,10 @@ extern "C" void HandlerRemoveType(BattleEventItem* item, ServerFlow* serverFlow,
 
         if (work[1] == 0) {
             HandlerParam_ChangeType* changeType = (HandlerParam_ChangeType*)BattleHandler_PushWork(serverFlow, EFFECT_CHANGE_TYPE, pokemonSlot);
-            changeType->pokeType = work[0];
+            // Hack PokeLobby (streamers-serie-2#24): EFFECT_CHANGE_TYPE espera un par de tipos, no un tipo suelto
+            // (como Anegar o Mutatipo). Con un tipo suelto no cambiaba nada. Si solo tenia ese tipo, queda sin tipo
+            // (TYPE_NULL), que la tabla de tipos trata como neutro a todo, igual que el tipo ??? de los oficiales.
+            changeType->pokeType = PokeTypePair_MakeMonotype(work[0]);
             changeType->pokeID = pokemonSlot;
             changeType->skipText = 1;
             BattleHandler_PopWork(serverFlow, changeType);
