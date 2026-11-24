@@ -246,6 +246,28 @@ static b32 HoldsBerry(ServerFlow* serverFlow, u32 slot) {
     ITEM itemID = BattleMon_GetHeldItem(mon);
     return itemID && PML_ItemIsBerry(itemID);
 }
+// Hack PokeLobby (streamers-serie-2#24): comer la baya a la fuerza, como Bicho Bocado:
+// se quita y su efecto se aplica aunque no se cumpla su condicion (vida llena...).
+// EFFECT_USE_HELD_ITEM la usaba "de forma normal" y con la vida llena no se la comia.
+static void ComerBayaALaFuerza(ServerFlow* serverFlow, u32 slot) {
+    BattleMon* mon = Handler_GetBattleMon(serverFlow, slot);
+    ITEM berry = BattleMon_GetHeldItem(mon);
+    if (!berry || !PML_ItemIsBerry(berry))
+        return;
+
+    HandlerParam_SetItem* setItem;
+    setItem = (HandlerParam_SetItem*)BattleHandler_PushWork(serverFlow, EFFECT_SET_HELD_ITEM, slot);
+    setItem->pokeID = (u8)slot;
+    setItem->itemID = 0;
+    setItem->callConsumedEvent = 1;
+    BattleHandler_PopWork(serverFlow, setItem);
+
+    HandlerParam_ActivateItem* forceUseItem;
+    forceUseItem = (HandlerParam_ActivateItem*)BattleHandler_PushWork(serverFlow, EFFECT_FORCE_USE_HELD_ITEM, slot);
+    forceUseItem->itemID = berry;
+    forceUseItem->pokeID = (u8)slot;
+    BattleHandler_PopWork(serverFlow, forceUseItem);
+}
 extern "C" void HandlerTeatimeCheckFail(BattleEventItem* item, ServerFlow* serverFlow, u32 pokemonSlot, u32* work) {
     if (pokemonSlot == BattleEventVar_GetValue(VAR_ATTACKING_MON)) {
         for (u32 slot = 0; slot < 24; ++slot) {
@@ -264,7 +286,7 @@ extern "C" void HandlerTeatime(BattleEventItem* item, ServerFlow* serverFlow, u3
 
         for (u32 slot = 0; slot < 24; ++slot) {
             if (HoldsBerry(serverFlow, slot))
-                BattleHandler_PushRun(serverFlow, EFFECT_USE_HELD_ITEM, slot);
+                ComerBayaALaFuerza(serverFlow, slot);
         }
     }
 }
