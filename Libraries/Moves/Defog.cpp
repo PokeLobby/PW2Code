@@ -48,10 +48,14 @@ extern "C" void HandlerDefog(BattleEventItem* item, ServerFlow* serverFlow, u32 
         SET_REMOVE_SIDE_EFFEC_FLAG(SIDEEFF_STICKY_WEB, removeEnemySide->flags);
         BattleHandler_PopWork(serverFlow, removeEnemySide);
 
+        b32 habiaCampo = ServerEvent_GetTerrain(serverFlow) != TERRAIN_NULL;
         HandlerParam_RemoveFieldEffect* removeFieldEffect;
         removeFieldEffect = (HandlerParam_RemoveFieldEffect*)BattleHandler_PushWork(serverFlow, EFFECT_REMOVE_FIELD_EFFECT, pokemonSlot);
         removeFieldEffect->effect = FLDEFF_TERRAIN;
         BattleHandler_PopWork(serverFlow, removeFieldEffect);
+        // Como al acabarse los turnos: Mimetismo, Carga Cuantica... se enteran (streamers-serie-2#24)
+        if (habiaCampo)
+            ServerEvent_ChangeTerrain(serverFlow, TERRAIN_NULL);
     }
 }
 extern "C" void HandlerBypassSubstitute(BattleEventItem* item, ServerFlow* serverFlow, u32 pokemonSlot, u32* work);

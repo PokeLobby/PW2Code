@@ -1997,6 +1997,12 @@ extern "C" b32 THUMB_BRANCH_BattleField_RemoveEffectCore(BattleFieldExt * battle
     }
 
     BattleField_ClearFactorWork(battleField, fieldEffect);
+    // Hack PokeLobby (streamers-serie-2#24): quitar el campo con un ataque
+    // (Allanador Ferreo, Giro Helado...) no pasaba por BattleField_EndTerrain y
+    // el campo seguia activo sin contar turnos.
+    if (fieldEffect == FLDEFF_TERRAIN) {
+        BattleField_EndTerrain(battleField);
+    }
     return 1;
 }
 

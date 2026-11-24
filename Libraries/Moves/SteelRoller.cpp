@@ -23,6 +23,8 @@ extern "C" void HandlerSteelRoller(BattleEventItem* item, ServerFlow* serverFlow
             removeFieldEffect = (HandlerParam_RemoveFieldEffect*)BattleHandler_PushWork(serverFlow, EFFECT_REMOVE_FIELD_EFFECT, pokemonSlot);
             removeFieldEffect->effect = FLDEFF_TERRAIN;
             BattleHandler_PopWork(serverFlow, removeFieldEffect);
+            // Como al acabarse los turnos: Mimetismo, Carga Cuantica... se enteran (streamers-serie-2#24)
+            ServerEvent_ChangeTerrain(serverFlow, TERRAIN_NULL);
         }
     }
 }
