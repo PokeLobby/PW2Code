@@ -573,6 +573,8 @@ u8 megaEvolveFlag = UNTOGGLED_MEGA;
 #define MEGA_SE_CANCEL 1361
 // Brillo que se suma a la pantalla tactil (motor B) mientras la mega esta activada (0-16)
 #define MEGA_TINT_LEVEL 6
+// Motor de la pantalla tactil: 1 = motor B (sub). Si se aclarase la pantalla de arriba, poner 0.
+#define MEGA_TINT_ENGINE 1
 extern "C" void playSeqFullVol(int seqID);
 extern "C" void setBrightnessForEngine(int engine, int value);
 // 1 mientras el brillo de la pantalla tactil esta subido por la mega
@@ -582,7 +584,7 @@ static void SetMegaTint(u8 on)
     if (megaTintOn == on)
         return;
     megaTintOn = on;
-    setBrightnessForEngine(1, on ? MEGA_TINT_LEVEL : 0);
+    setBrightnessForEngine(MEGA_TINT_ENGINE, on ? MEGA_TINT_LEVEL : 0);
 }
 
 extern "C" void BattleAction_SetMegaEvolution(BattleActionParam* actionParam, u8 form)
