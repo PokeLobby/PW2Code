@@ -601,8 +601,10 @@ static void SetMegaTint(u8 on)
 // Si no encuentra sitio (o el motor usa paletas extendidas / mapeo 2D) no dibuja nada y se queda el
 // aviso por brillo de pantalla.
 #include "include/MegaIcon.h"
-#define MEGA_ICON_X 220
-#define MEGA_ICON_Y 0
+// Esquina inferior izquierda de la pantalla tactil (hueco libre; arriba a la derecha tapaba el icono
+// de la barra superior)
+#define MEGA_ICON_X 6
+#define MEGA_ICON_Y 158
 #define MEGA_ICON_READY_FRAMES 20
 #define OBJB_OAM  0x07000400
 #define OBJB_VRAM 0x06600000
@@ -663,7 +665,10 @@ static bool MegaIconPick()
         u16 a0 = ObjbOamRead(e, 0);
         u16 a1 = ObjbOamRead(e, 1);
         u16 a2 = ObjbOamRead(e, 2);
-        if ((a0 & 0x300) == 0x200)
+        // Una entrada libre esta desactivada (bit 9) o, como hace este juego con todas las que no usa,
+        // aparcada fuera de la pantalla (y >= 192, 0x00c0). Ninguna de las dos se dibuja: no cuenta
+        // ni para paletas ni para teselas ocupadas.
+        if ((a0 & 0x300) == 0x200 || ((a0 & 0x300) == 0 && (a0 & 0xff) >= 192))
         {
             if (freeOam < 0 && e > 0)
                 freeOam = e;
@@ -683,7 +688,7 @@ static bool MegaIconPick()
         refEnd[refCount] = refStart[refCount] + tiles * 32;
         ++refCount;
     }
-    if (freeOam < 0 || refCount == 0)
+    if (freeOam < 0)
         return false;
 
     int pal = -1;
