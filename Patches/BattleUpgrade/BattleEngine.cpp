@@ -633,7 +633,6 @@ MegaEvolution megaevolutions[]{
     {PKM_ABOMASNOW, ITEM_ABOMASITE, 1},
     {PKM_GALLADE, ITEM_GALLADITE, 1},
     {PKM_AUDINO, ITEM_AUDINITE, 1},
-    {PKM_MEWTWO, ITEM_MEWTWONITE_X, 1},
     {PKM_NULL, ITEM_DIANCITE, 1}, // TODO: ADD DIANCIE
 };
 extern "C" u8 CanMegaEvolve(BattleMon* battleMon)
@@ -6038,14 +6037,17 @@ extern "C" b32 THUMB_BRANCH_SAFESTACK_IsUnselectableMove(BtlClientWk* client, Ba
 #if ADD_MEGA_EVOLUTION || (EXPAND_ABILITIES && EXPAND_ITEMS)
 
 #if ADD_MEGA_EVOLUTION
-extern "C" ITEM GetMegaStone(SPECIES species) {
+// Devuelve 1 si itemID es alguna de las megapiedras de la especie (todas las filas, no solo la primera)
+extern "C" b32 IsMegaStoneOf(SPECIES species, ITEM itemID) {
+    if (itemID == ITEM_NULL || itemID == ITEM_MEGA_UNASSIGNED)
+        return 0;
     for (u32 idx = 0; idx < ARRAY_COUNT(megaevolutions); ++idx)
     {
         MegaEvolution* mega = &(megaevolutions[idx]);
-        if (mega->species == species)
-            return mega->item;
+        if (mega->species == species && mega->item == itemID)
+            return 1;
     }
-    return ITEM_NULL;
+    return 0;
 }
 #endif
 
@@ -6070,8 +6072,7 @@ extern "C" b32 THUMB_BRANCH_HandlerCommon_IsUnremovableItem(BattleMon* battleMon
     }
 
 #if ADD_MEGA_EVOLUTION
-    ITEM megaStone = GetMegaStone(battleMon->species);
-    if (megaStone != ITEM_NULL && megaStone == itemID) {
+    if (IsMegaStoneOf(battleMon->species, itemID)) {
         return 1;
     }
 #endif
