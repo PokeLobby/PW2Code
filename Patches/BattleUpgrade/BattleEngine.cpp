@@ -653,7 +653,7 @@ MegaEvolution megaevolutions[]{
     {PKM_ABOMASNOW, ITEM_ABOMASITE, 1},
     {PKM_GALLADE, ITEM_GALLADITE, 1},
     {PKM_AUDINO, ITEM_AUDINITE, 1},
-    {PKM_NULL, ITEM_DIANCITE, 1}, // TODO: ADD DIANCIE
+    {(SPECIES)719, ITEM_DIANCITE, 1}, // Diancie (719): forma 1 = datos 1114, sprite ranura 171
 };
 extern "C" u8 CanMegaEvolve(BattleMon* battleMon)
 {
