@@ -11,7 +11,7 @@
 // Implemented as Reflect + Light Screen at the same time (5 turns, 8 with Light Clay, removed by Brick Break, Defog, etc.)
 // It can only be used while it is hailing (snowing)
 extern "C" void HandlerAuroraVeilCheckFail(BattleEventItem* item, ServerFlow* serverFlow, u32 pokemonSlot, u32* work) {
-    if (pokemonSlot == BattleEventVar_GetValue(VAR_ATTACKING_MON)) {
+    if (pokemonSlot == BattleEventVar_GetValue(VAR_MON_ID)) {
         WEATHER weather = Handler_CheckWeather(serverFlow, pokemonSlot, BATTLE_MAX_SLOTS, ServerEvent_GetWeather(serverFlow));
         if (weather != WEATHER_HAIL) {
             BattleEventVar_RewriteValue(VAR_FAIL_CAUSE, MOVEFAIL_OTHER);

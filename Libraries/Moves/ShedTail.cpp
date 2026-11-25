@@ -49,7 +49,7 @@ extern "C" BattleEventHandlerTableEntry* EventAddPosShedTail(u32* handlerAmount)
 // SHED TAIL
 // work[0] -> True if the user should switch out when the move ends
 extern "C" void HandlerShedTailCheckFail(BattleEventItem* item, ServerFlow* serverFlow, u32 pokemonSlot, u32* work) {
-    if (pokemonSlot == BattleEventVar_GetValue(VAR_ATTACKING_MON)) {
+    if (pokemonSlot == BattleEventVar_GetValue(VAR_MON_ID)) {
         BattleMon* currentMon = Handler_GetBattleMon(serverFlow, pokemonSlot);
         u32 maxHP = BattleMon_GetValue(currentMon, VALUE_MAX_HP);
         u32 currentHP = BattleMon_GetValue(currentMon, VALUE_CURRENT_HP);

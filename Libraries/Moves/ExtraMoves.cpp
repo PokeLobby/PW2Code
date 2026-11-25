@@ -151,7 +151,7 @@ extern "C" BattleEventHandlerTableEntry* EventAddSuperEffectiveBoost(u32* handle
 
 // ---------------- GIGATON HAMMER (893) / BLOOD MOON (901): no dos veces seguidas
 extern "C" void HandlerNotTwiceCheckFail(BattleEventItem* item, ServerFlow* serverFlow, u32 pokemonSlot, u32* work) {
-    if (pokemonSlot == BattleEventVar_GetValue(VAR_ATTACKING_MON)) {
+    if (pokemonSlot == BattleEventVar_GetValue(VAR_MON_ID)) {
         BattleMon* currentMon = Handler_GetBattleMon(serverFlow, pokemonSlot);
         if (BattleMon_GetPreviousMove(currentMon) == (MOVE_ID)BattleEventVar_GetValue(VAR_MOVE_ID)) {
             BattleEventVar_RewriteValue(VAR_FAIL_CAUSE, MOVEFAIL_OTHER);

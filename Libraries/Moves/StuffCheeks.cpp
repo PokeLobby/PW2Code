@@ -8,7 +8,7 @@
 // STUFF CHEEKS
 // Fails if the user doesn't hold a berry. Eats the berry (with its effect) and raises the Defense by 2 stages.
 extern "C" void HandlerStuffCheeksCheckFail(BattleEventItem* item, ServerFlow* serverFlow, u32 pokemonSlot, u32* work) {
-    if (pokemonSlot == BattleEventVar_GetValue(VAR_ATTACKING_MON)) {
+    if (pokemonSlot == BattleEventVar_GetValue(VAR_MON_ID)) {
         BattleMon* currentMon = Handler_GetBattleMon(serverFlow, pokemonSlot);
         ITEM itemID = BattleMon_GetHeldItem(currentMon);
         if (!itemID || !PML_ItemIsBerry(itemID)) {

@@ -50,7 +50,7 @@ extern "C" void HandlerShellTrapBeforeAttacks(BattleEventItem* item, ServerFlow*
     }
 }
 extern "C" void HandlerShellTrapCheckFail(BattleEventItem* item, ServerFlow* serverFlow, u32 pokemonSlot, u32* work) {
-    if (pokemonSlot == BattleEventVar_GetValue(VAR_ATTACKING_MON)) {
+    if (pokemonSlot == BattleEventVar_GetValue(VAR_MON_ID)) {
         if (!BattleField_GetShellTrapHit(pokemonSlot)) {
             BattleEventVar_RewriteValue(VAR_FAIL_CAUSE, MOVEFAIL_OTHER);
         }

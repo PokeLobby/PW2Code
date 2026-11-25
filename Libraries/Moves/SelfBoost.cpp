@@ -80,7 +80,7 @@ extern "C" BattleEventHandlerTableEntry* EventAddClangorousSoulblaze(u32* handle
 
 // ---------------- CLANGOROUS SOUL (775)
 extern "C" void HandlerClangorousSoulCheckFail(BattleEventItem* item, ServerFlow* serverFlow, u32 pokemonSlot, u32* work) {
-    if (pokemonSlot == BattleEventVar_GetValue(VAR_ATTACKING_MON)) {
+    if (pokemonSlot == BattleEventVar_GetValue(VAR_MON_ID)) {
         BattleMon* currentMon = Handler_GetBattleMon(serverFlow, pokemonSlot);
         u32 maxHP = BattleMon_GetValue(currentMon, VALUE_MAX_HP);
         u32 currentHP = BattleMon_GetValue(currentMon, VALUE_CURRENT_HP);
@@ -107,7 +107,7 @@ extern "C" BattleEventHandlerTableEntry* EventAddClangorousSoul(u32* handlerAmou
 
 // ---------------- FILLET AWAY (868)
 extern "C" void HandlerFilletAwayCheckFail(BattleEventItem* item, ServerFlow* serverFlow, u32 pokemonSlot, u32* work) {
-    if (pokemonSlot == BattleEventVar_GetValue(VAR_ATTACKING_MON)) {
+    if (pokemonSlot == BattleEventVar_GetValue(VAR_MON_ID)) {
         BattleMon* currentMon = Handler_GetBattleMon(serverFlow, pokemonSlot);
         u32 maxHP = BattleMon_GetValue(currentMon, VALUE_MAX_HP);
         u32 currentHP = BattleMon_GetValue(currentMon, VALUE_CURRENT_HP);
@@ -136,7 +136,7 @@ extern "C" BattleEventHandlerTableEntry* EventAddFilletAway(u32* handlerAmount) 
 
 // ---------------- NO RETREAT (748)
 extern "C" void HandlerNoRetreatCheckFail(BattleEventItem* item, ServerFlow* serverFlow, u32 pokemonSlot, u32* work) {
-    if (pokemonSlot == BattleEventVar_GetValue(VAR_ATTACKING_MON)) {
+    if (pokemonSlot == BattleEventVar_GetValue(VAR_MON_ID)) {
         // Solo se puede usar una vez por entrada en combate
         if (GetLote4State()->noRetreat[pokemonSlot]) {
             BattleEventVar_RewriteValue(VAR_FAIL_CAUSE, MOVEFAIL_OTHER);

@@ -269,7 +269,7 @@ static void ComerBayaALaFuerza(ServerFlow* serverFlow, u32 slot) {
     BattleHandler_PopWork(serverFlow, forceUseItem);
 }
 extern "C" void HandlerTeatimeCheckFail(BattleEventItem* item, ServerFlow* serverFlow, u32 pokemonSlot, u32* work) {
-    if (pokemonSlot == BattleEventVar_GetValue(VAR_ATTACKING_MON)) {
+    if (pokemonSlot == BattleEventVar_GetValue(VAR_MON_ID)) {
         for (u32 slot = 0; slot < 24; ++slot) {
             if (HoldsBerry(serverFlow, slot))
                 return;

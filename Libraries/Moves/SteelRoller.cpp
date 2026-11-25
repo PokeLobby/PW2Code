@@ -10,7 +10,7 @@
 // Hack PokeLobby (lote 3): STEEL ROLLER (798)
 // Fails if no terrain is active; if it hits, it removes the terrain.
 extern "C" void HandlerSteelRollerCheckFail(BattleEventItem* item, ServerFlow* serverFlow, u32 pokemonSlot, u32* work) {
-    if (pokemonSlot == BattleEventVar_GetValue(VAR_ATTACKING_MON)) {
+    if (pokemonSlot == BattleEventVar_GetValue(VAR_MON_ID)) {
         if (ServerEvent_GetTerrain(serverFlow) == TERRAIN_NULL) {
             BattleEventVar_RewriteValue(VAR_FAIL_CAUSE, MOVEFAIL_OTHER);
         }

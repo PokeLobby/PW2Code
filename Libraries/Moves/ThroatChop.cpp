@@ -10,7 +10,7 @@
 // work[0] -> battle slot of the Pokemon that can't use sound moves
 // work[1] -> turn checks elapsed (the effect lasts the turn it is applied and the next one)
 extern "C" void HandlerPosThroatChopCheckFail(BattleEventItem* item, ServerFlow* serverFlow, u32 targetPos, u32* work) {
-    u32 attackingSlot = BattleEventVar_GetValue(VAR_ATTACKING_MON);
+    u32 attackingSlot = BattleEventVar_GetValue(VAR_MON_ID);
     if (attackingSlot != work[0])
         return;
     if (BattleEventVar_GetValue(VAR_FAIL_CAUSE))

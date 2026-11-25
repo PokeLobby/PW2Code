@@ -22,7 +22,7 @@ extern "C" u32 RevivalBlessingFindTarget(ServerFlow* serverFlow, u32 pokemonSlot
     return BATTLE_MAX_SLOTS;
 }
 extern "C" void HandlerRevivalBlessingCheckFail(BattleEventItem* item, ServerFlow* serverFlow, u32 pokemonSlot, u32* work) {
-    if (pokemonSlot == BattleEventVar_GetValue(VAR_ATTACKING_MON)) {
+    if (pokemonSlot == BattleEventVar_GetValue(VAR_MON_ID)) {
         if (RevivalBlessingFindTarget(serverFlow, pokemonSlot) == BATTLE_MAX_SLOTS) {
             BattleEventVar_RewriteValue(VAR_FAIL_CAUSE, MOVEFAIL_OTHER);
         }

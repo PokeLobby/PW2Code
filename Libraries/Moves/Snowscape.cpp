@@ -9,7 +9,7 @@
 // SNOWSCAPE
 // In this game Hail is replaced by Snow (SNOW_WEATHER), so Snowscape sets the same weather as Hail for 5 turns
 extern "C" void HandlerSnowscapeCheckFail(BattleEventItem* item, ServerFlow* serverFlow, u32 pokemonSlot, u32* work) {
-    if (pokemonSlot == BattleEventVar_GetValue(VAR_ATTACKING_MON)) {
+    if (pokemonSlot == BattleEventVar_GetValue(VAR_MON_ID)) {
         if (!CanWeatherBeChanged(serverFlow, WEATHER_HAIL, 5, 0)) {
             BattleEventVar_RewriteValue(VAR_FAIL_CAUSE, MOVEFAIL_OTHER);
         }

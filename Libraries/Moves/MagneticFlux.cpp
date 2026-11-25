@@ -25,7 +25,7 @@ extern "C" void HandlerMagneticFlux(BattleEventItem* item, ServerFlow* serverFlo
 // Hack PokeLobby: si ni el usuario ni sus aliados en el campo tienen Plus o Minus, el movimiento falla
 // («¡Pero ha fallado!», como en los oficiales) en vez de mostrar «No afecta a...» con cada Pokémon.
 extern "C" void HandlerMagneticFluxCheckFail(BattleEventItem* item, ServerFlow* serverFlow, u32 pokemonSlot, u32* work) {
-    if (pokemonSlot != BattleEventVar_GetValue(VAR_ATTACKING_MON))
+    if (pokemonSlot != BattleEventVar_GetValue(VAR_MON_ID))
         return;
     for (u32 i = 0; i < 24; ++i) {
         BattleMon* currentMon = PokeCon_GetBattleMon(serverFlow->pokeCon, i);
