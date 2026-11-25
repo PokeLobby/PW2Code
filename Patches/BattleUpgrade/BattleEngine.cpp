@@ -587,6 +587,183 @@ static void SetMegaTint(u8 on)
     setBrightnessForEngine(MEGA_TINT_ENGINE, on ? MEGA_TINT_LEVEL : 0);
 }
 
+// ---------------------------------------------------------------------------------------------
+// Icono de Mega-Evolucion en la pantalla de ataques (Launcher#139, fase 6)
+//
+// Un OBJ de 32x32 en el motor B (pantalla tactil), arriba a la derecha, en la franja libre sobre
+// los cuatro botones de ataque (los botones tactiles empiezan en y=32). Apagado = paleta gris,
+// encendido = paleta de color. Se dibuja escribiendo directamente en la OAM, la VRAM de OBJ y la
+// paleta de OBJ del motor B, sin pasar por el gestor de actores del juego:
+//  - entrada de OAM: la mas alta que este desactivada;
+//  - paleta: la ranura de 16 colores mas alta que ningun OBJ visible usa;
+//  - teselas: el hueco de 512 bytes mas alto de los primeros 16 KB de la VRAM de OBJ que este a
+//    cero (o ya tenga el icono) y no lo use ningun OBJ visible.
+// Si no encuentra sitio (o el motor usa paletas extendidas / mapeo 2D) no dibuja nada y se queda el
+// aviso por brillo de pantalla.
+#include "include/MegaIcon.h"
+#define MEGA_ICON_X 220
+#define MEGA_ICON_Y 0
+#define MEGA_ICON_READY_FRAMES 20
+#define OBJB_OAM  0x07000400
+#define OBJB_VRAM 0x06600000
+#define OBJB_PAL  0x05000600
+#define ENGB_DISPCNT 0x04001000
+// Direccion (en el arm9) del puntero a los buffers de OAM del gestor de OAM del juego (0x540 bytes
+// por motor, la OAM empieza en +0x100)
+#define OAM_MANAGER_PTR 0x2060a80
+#define OAM_MANAGER_STRIDE 0x540
+#define OAM_MANAGER_OAM_OFFSET 0x100
+#define OAM_MANAGER_ENGINE_B 1
+
+u8 megaIconOk = 0;      // 1 si se pudo reservar sitio para el icono
+u8 megaIconShown = 0;   // 1 mientras el icono esta en la OAM
+u8 megaIconReady = 0;   // fotogramas seguidos con la pantalla de ataques lista
+static u32 megaIconOam = 127;
+static u32 megaIconTile = 0;   // indice de tesela de la OAM
+static u32 megaIconTileAddr = 0;
+static u32 megaIconPal = 15;
+
+static inline u16 ObjbOamRead(u32 idx, u32 k) { return *(volatile u16*)(OBJB_OAM + idx * 8 + k * 2); }
+
+static void ObjbOamWrite(u32 idx, u16 a0, u16 a1, u16 a2)
+{
+    volatile u16* hw = (volatile u16*)(OBJB_OAM + idx * 8);
+    hw[0] = a0; hw[1] = a1; hw[2] = a2;
+    // Copia tambien en el buffer del gestor de OAM, por si vuelca la OAM entera
+    u32 base = *(volatile u32*)OAM_MANAGER_PTR;
+    if (base >= 0x02000000 && base < 0x02400000)
+    {
+        volatile u16* sh = (volatile u16*)(base + OAM_MANAGER_STRIDE * OAM_MANAGER_ENGINE_B + OAM_MANAGER_OAM_OFFSET + idx * 8);
+        sh[0] = a0; sh[1] = a1; sh[2] = a2;
+    }
+}
+
+static bool MegaIconPick()
+{
+    u32 dispcnt = *(volatile u32*)ENGB_DISPCNT;
+    if (dispcnt & (1u << 31)) return false;     // paletas extendidas de OBJ
+    if (!(dispcnt & 0x10)) return false;        // mapeo 2D de teselas
+    if (dispcnt & (1u << 21)) return false;
+    u32 tileShift = 5 + ((dispcnt >> 20) & 1);  // 32 o 64 bytes por unidad de tesela
+
+    // Ancho y alto en teselas segun forma/tamano
+    static const u8 dims[3][4][2] = {
+        {{1, 1}, {2, 2}, {4, 4}, {8, 8}},
+        {{2, 1}, {4, 1}, {4, 2}, {8, 4}},
+        {{1, 2}, {1, 4}, {2, 4}, {4, 8}},
+    };
+
+    u32 usedPal = 0;
+    u32 refStart[64];
+    u32 refEnd[64];
+    u32 refCount = 0;
+    int freeOam = -1;
+    for (int e = 127; e >= 0; --e)
+    {
+        u16 a0 = ObjbOamRead(e, 0);
+        u16 a1 = ObjbOamRead(e, 1);
+        u16 a2 = ObjbOamRead(e, 2);
+        if ((a0 & 0x300) == 0x200)
+        {
+            if (freeOam < 0 && e > 0)
+                freeOam = e;
+            continue;
+        }
+        bool c256 = (a0 & 0x2000) != 0;
+        if (!c256)
+            usedPal |= 1u << (a2 >> 12);
+        u32 shape = a0 >> 14;
+        u32 size = a1 >> 14;
+        if (shape > 2)
+            continue;
+        if (refCount >= 64)
+            return false;   // demasiados OBJ visibles: no arriesgar
+        u32 tiles = dims[shape][size][0] * dims[shape][size][1] * (c256 ? 2 : 1);
+        refStart[refCount] = (u32)(a2 & 0x3ff) << tileShift;
+        refEnd[refCount] = refStart[refCount] + tiles * 32;
+        ++refCount;
+    }
+    if (freeOam < 0 || refCount == 0)
+        return false;
+
+    int pal = -1;
+    for (int p = 15; p >= 0; --p)
+        if (!(usedPal & (1u << p)))
+        {
+            pal = p;
+            break;
+        }
+    if (pal < 0)
+        return false;
+
+    // Hueco de teselas: de arriba abajo en los primeros 16 KB
+    for (int slot = 31; slot >= 0; --slot)
+    {
+        u32 addr = (u32)slot * 512;
+        bool clash = false;
+        for (u32 r = 0; r < refCount; ++r)
+            if (refStart[r] < addr + 512 && refEnd[r] > addr)
+            {
+                clash = true;
+                break;
+            }
+        if (clash)
+            continue;
+        volatile u32* v = (volatile u32*)(OBJB_VRAM + addr);
+        bool zero = true;
+        bool mine = true;
+        for (u32 i = 0; i < 128; ++i)
+        {
+            u32 w = v[i];
+            if (w != 0) zero = false;
+            if (w != megaIconTiles[i]) mine = false;
+        }
+        if (!zero && !mine)
+            continue;
+        megaIconOam = (u32)freeOam;
+        megaIconPal = (u32)pal;
+        megaIconTileAddr = addr;
+        megaIconTile = addr >> tileShift;
+        return true;
+    }
+    return false;
+}
+
+static void MegaIconDraw(bool on)
+{
+    if (!megaIconShown)
+    {
+        if (!MegaIconPick())
+        {
+            megaIconOk = 0;
+            return;
+        }
+        megaIconShown = 1;
+        megaIconOk = 1;
+    }
+    volatile u32* v = (volatile u32*)(OBJB_VRAM + megaIconTileAddr);
+    for (u32 i = 0; i < 128; ++i)
+        if (v[i] != megaIconTiles[i])
+            v[i] = megaIconTiles[i];
+    volatile u16* p = (volatile u16*)(OBJB_PAL + megaIconPal * 32);
+    const u16* src = on ? megaIconPalOn : megaIconPalOff;
+    for (u32 i = 0; i < 16; ++i)
+        p[i] = src[i];
+    // 32x32 (forma cuadrada, tamano 2), 16 colores, prioridad 0
+    ObjbOamWrite(megaIconOam,
+                 (u16)(MEGA_ICON_Y & 0xff),
+                 (u16)((MEGA_ICON_X & 0x1ff) | (2 << 14)),
+                 (u16)((megaIconTile & 0x3ff) | (megaIconPal << 12)));
+}
+
+static void MegaIconHide()
+{
+    if (!megaIconShown)
+        return;
+    megaIconShown = 0;
+    ObjbOamWrite(megaIconOam, 0x0200, 0, 0);
+}
+
 extern "C" void BattleAction_SetMegaEvolution(BattleActionParam* actionParam, u8 form)
 {
     ((BattleAction_Fight*)actionParam)->pad = form;
@@ -706,11 +883,23 @@ extern "C" u32 THUMB_BRANCH_LINK_BattleClient_ActionSelectFight_0x8E(BtlvCore* b
             }
         }
 
-        // Pantalla tactil mas clara mientras la Mega-Evolucion esta activada
-        SetMegaTint(megaEvolveFlag != UNTOGGLED_MEGA);
+        // Pantalla tactil mas clara mientras la Mega-Evolucion esta activada: solo si no hay icono
+        SetMegaTint(megaEvolveFlag != UNTOGGLED_MEGA && !megaIconOk);
     }
 
-    return BattleViewCmd_UI_SelectMove_Wait(btlCore);
+    // Esta funcion devuelve distinto de 0 solo cuando se ha elegido algo; mientras espera, cada fotograma
+    // pasa por aqui (la interfaz se construye en los primeros fotogramas)
+    u32 selectMoveReady = BattleViewCmd_UI_SelectMove_Wait(btlCore);
+    // Icono de Mega-Evolucion: visible si este Pokemon puede megaevolucionar ahora (o ya la tiene marcada)
+    bool canToggle = megaEvolveFlag != ALREADY_MEGA && megaEvolveFlag != OTHER_MEGA &&
+                     (megaEvolveFlag != UNTOGGLED_MEGA || CanMegaEvolve(btlCore->activeMon));
+    if (!canToggle)
+        MegaIconHide();
+    else if (megaIconReady < MEGA_ICON_READY_FRAMES)
+        ++megaIconReady;
+    else
+        MegaIconDraw(megaEvolveFlag != UNTOGGLED_MEGA);
+    return selectMoveReady;
 }
 
 extern "C" u32 THUMB_BRANCH_LINK_BattleClient_ActionSelectFight_0x9A(BattleActionParam* actionParam)
@@ -719,6 +908,8 @@ extern "C" u32 THUMB_BRANCH_LINK_BattleClient_ActionSelectFight_0x9A(BattleActio
 
     // Se sale de la pantalla de ataques (ataque elegido o vuelta atras): fuera el brillo
     SetMegaTint(0);
+    MegaIconHide();
+    megaIconReady = 0;
 
     if (action)
         if (megaEvolveFlag != ALREADY_MEGA && 
