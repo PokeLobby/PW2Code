@@ -856,7 +856,11 @@ extern "C" void THUMB_BRANCH_LINK_BattleClient_ActionSelect_Root_0x58(BattleActi
     {
         // Reset the Mega-Evolution flag if the deleted action was supposed to Mega-Evolve
         if (BattleAction_CheckMegaEvolution(actionParam))
-            megaEvolveFlag = UNTOGGLED_MEGA; 
+            megaEvolveFlag = UNTOGGLED_MEGA;
+        // Hack PokeLobby: una Mega marcada con START pero sin ataque elegido no pasa al menu de otro
+        // Pokemon ni al turno siguiente (se gastaba en uno que no podia megaevolucionar)
+        else if (megaEvolveFlag != OTHER_MEGA)
+            megaEvolveFlag = UNTOGGLED_MEGA;
     }
 
     BattleAction_SetNull(actionParam);
@@ -916,15 +920,22 @@ extern "C" u32 THUMB_BRANCH_LINK_BattleClient_ActionSelectFight_0x9A(BattleActio
     MegaIconHide();
     megaIconReady = 0;
 
-    if (action)
-        if (megaEvolveFlag != ALREADY_MEGA && 
-            megaEvolveFlag != OTHER_MEGA && 
-            megaEvolveFlag != UNTOGGLED_MEGA)
+    if (megaEvolveFlag != ALREADY_MEGA &&
+        megaEvolveFlag != OTHER_MEGA &&
+        megaEvolveFlag != UNTOGGLED_MEGA)
+    {
+        if (action)
         {
             // Set the Mega-Evolution flag in the action data
             BattleAction_SetMegaEvolution(actionParam, megaEvolveFlag);
             megaEvolveFlag = OTHER_MEGA;
         }
+        else
+        {
+            // Hack PokeLobby: vuelta atras sin elegir ataque = la Mega se desmarca
+            megaEvolveFlag = UNTOGGLED_MEGA;
+        }
+    }
     
     return action;
 }
@@ -1121,15 +1132,29 @@ extern "C" int THUMB_BRANCH_ServerFlow_ActOrderProcMain(ServerFlow * serverFlow,
 
 #if ADD_MEGA_EVOLUTION
         
-    // If a Mega-Evolution was succesful, lock the flag for the rest of the battle
-    if (megaEvolveFlag == OTHER_MEGA)
-        megaEvolveFlag = ALREADY_MEGA;
+    // Hack PokeLobby: la Mega del jugador solo se da por gastada si de verdad megaevoluciona
+    // (antes se bloqueaba aunque la accion con la Mega se hubiera borrado o fuera de otro Pokemon)
+    u8 megaReservada = megaEvolveFlag == OTHER_MEGA;
+    u8 megaDelJugador = 0;
 
     u8 hasMegaEvolved = 0;
     for (u32 actionIdx = 0; actionIdx < serverFlow->numActOrder; ++actionIdx)
     {
         BattleActionParam* actionParam = &(actionOrderWork[actionIdx].action);
         u8 megaevolution = BattleAction_CheckMegaEvolution(actionParam);
+        // Hack PokeLobby: solo megaevoluciona quien puede con su piedra y aun no lo ha hecho
+        if (megaevolution)
+        {
+            BattleMon* monAccion = actionOrderWork[actionIdx].battleMon;
+            if (BattleAction_GetAction(actionParam) != 1 || CanMegaEvolve(monAccion) != megaevolution ||
+                monAccion->form == megaevolution)
+            {
+                BattleAction_ResetMegaEvolution(actionParam);
+                megaevolution = 0;
+            }
+            else
+                megaDelJugador = 1;
+        }
 
         // Un Pokemon de la IA con su megapiedra megaevoluciona la primera vez que ataca
         if (!megaevolution && BattleAction_GetAction(actionParam) == 1)
@@ -1164,6 +1189,9 @@ extern "C" int THUMB_BRANCH_ServerFlow_ActOrderProcMain(ServerFlow * serverFlow,
             hasMegaEvolved = 1;
         }
     }
+    if (megaReservada)
+        megaEvolveFlag = megaDelJugador ? ALREADY_MEGA : UNTOGGLED_MEGA;
+
     // Re-calc speed if any Pokémon has Mega-Evolved
     if (hasMegaEvolved)
         PokeSet_SortBySpeedDynamic(serverFlow, actionOrderWork, (u8)currentActionIdx, 1);
