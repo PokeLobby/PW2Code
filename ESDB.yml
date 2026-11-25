@@ -3994,3 +3994,6 @@ Symbols:
   - Name: BmpWin_FlushChar
     Segment: 0x0
     Address: 0x2048271
+  - Name: setBrightnessForEngine
+    Segment: 0x0
+    Address: 0x2027c21

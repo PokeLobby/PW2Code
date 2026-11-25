@@ -567,6 +567,24 @@ extern "C" u32 THUMB_BRANCH_BattleHandler_SendLast(ServerFlow * serverFlow, Hand
 // Stores if this client has already used Mega-Evolution in the current fight
 u8 megaEvolveFlag = UNTOGGLED_MEGA;
 
+// Indicador de Mega-Evolucion activada en la pantalla de ataques (solo el jugador).
+// Sonidos del SDAT del juego (id = indice en la lista de secuencias): SEQ_SE_DECIDE5 / SEQ_SE_CANCEL1.
+#define MEGA_SE_ACTIVATE 1360
+#define MEGA_SE_CANCEL 1361
+// Brillo que se suma a la pantalla tactil (motor B) mientras la mega esta activada (0-16)
+#define MEGA_TINT_LEVEL 6
+extern "C" void playSeqFullVol(int seqID);
+extern "C" void setBrightnessForEngine(int engine, int value);
+// 1 mientras el brillo de la pantalla tactil esta subido por la mega
+u8 megaTintOn = 0;
+static void SetMegaTint(u8 on)
+{
+    if (megaTintOn == on)
+        return;
+    megaTintOn = on;
+    setBrightnessForEngine(1, on ? MEGA_TINT_LEVEL : 0);
+}
+
 extern "C" void BattleAction_SetMegaEvolution(BattleActionParam* actionParam, u8 form)
 {
     ((BattleAction_Fight*)actionParam)->pad = form;
@@ -673,14 +691,21 @@ extern "C" u32 THUMB_BRANCH_LINK_BattleClient_ActionSelectFight_0x8E(BtlvCore* b
             {
                 megaEvolveFlag = CanMegaEvolve(btlCore->activeMon);
                 if (megaEvolveFlag)
+                {
                     DPRINT("MEGA-EVOLUTION!!!!!!!!! \n");
+                    playSeqFullVol(MEGA_SE_ACTIVATE);
+                }
             }
             else
             {
                 megaEvolveFlag = UNTOGGLED_MEGA;
                 DPRINT("DEACTIVATED MEGA-EVOLUTION \n");
+                playSeqFullVol(MEGA_SE_CANCEL);
             }
         }
+
+        // Pantalla tactil mas clara mientras la Mega-Evolucion esta activada
+        SetMegaTint(megaEvolveFlag != UNTOGGLED_MEGA);
     }
 
     return BattleViewCmd_UI_SelectMove_Wait(btlCore);
@@ -689,6 +714,9 @@ extern "C" u32 THUMB_BRANCH_LINK_BattleClient_ActionSelectFight_0x8E(BtlvCore* b
 extern "C" u32 THUMB_BRANCH_LINK_BattleClient_ActionSelectFight_0x9A(BattleActionParam* actionParam)
 {
     u32 action = BattleAction_GetAction(actionParam);
+
+    // Se sale de la pantalla de ataques (ataque elegido o vuelta atras): fuera el brillo
+    SetMegaTint(0);
 
     if (action)
         if (megaEvolveFlag != ALREADY_MEGA && 
@@ -862,6 +890,26 @@ extern "C" void ResetExtraActionFlag()
     extraActionFlag = 0;
 }
 
+#if ADD_MEGA_EVOLUTION
+// Mega-Evolucion de los rivales: forma a la que megaevoluciona un Pokemon controlado por la IA
+// (entrenador; no salvaje, demo ni online; no es el cliente del jugador) si lleva su megapiedra y aun no la tiene.
+static u8 GetAIMegaForm(ServerFlow* serverFlow, BattleMon* battleMon)
+{
+    BtlType battleType = MainModule_GetBattleType(serverFlow->mainModule);
+    if (battleType == BtlType_Wild || battleType == BtlType_Demo || battleType == BtlType_Online)
+        return 0;
+    if (BattleMon_IsFainted(battleMon))
+        return 0;
+    if (MainModule_PokeIDToClientID(battleMon->battleSlot) == serverFlow->mainModule->playerClientID)
+        return 0;
+
+    u8 form = CanMegaEvolve(battleMon);
+    if (!form || battleMon->form == form)
+        return 0;
+    return form;
+}
+#endif
+
 extern "C" int THUMB_BRANCH_ServerFlow_ActOrderProcMain(ServerFlow * serverFlow, u32 currentActionIdx) {
     u32 procAction = 0;
     ActionOrderWork* actionOrderWork = serverFlow->actionOrderWork;
@@ -884,7 +932,11 @@ extern "C" int THUMB_BRANCH_ServerFlow_ActOrderProcMain(ServerFlow * serverFlow,
     {
         BattleActionParam* actionParam = &(actionOrderWork[actionIdx].action);
         u8 megaevolution = BattleAction_CheckMegaEvolution(actionParam);
-        
+
+        // Un Pokemon de la IA con su megapiedra megaevoluciona la primera vez que ataca
+        if (!megaevolution && BattleAction_GetAction(actionParam) == 1)
+            megaevolution = GetAIMegaForm(serverFlow, actionOrderWork[actionIdx].battleMon);
+
         // Check if the fight actions have the Mega-Evolution flag set
         if (BattleAction_GetAction(actionParam) == 1 &&
             megaevolution)
@@ -5168,6 +5220,7 @@ extern "C" void THUMB_BRANCH_LINK_ServerFlow_SetupBeforeFirstTurn_0x6E(ServerFlo
 #if ADD_MEGA_EVOLUTION
     // Reset the Mega-Evolution flag at the start of the battle
     megaEvolveFlag = UNTOGGLED_MEGA;
+    megaTintOn = 0;
 #endif
 
     ServerControl_SwitchInCore(serverFlow, clientID, switchInSlot, switchOutSlot);
