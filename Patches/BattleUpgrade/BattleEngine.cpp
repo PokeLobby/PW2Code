@@ -566,6 +566,11 @@ extern "C" u32 THUMB_BRANCH_BattleHandler_SendLast(ServerFlow * serverFlow, Hand
 #define ALREADY_MEGA 0xFF
 // Stores if this client has already used Mega-Evolution in the current fight
 u8 megaEvolveFlag = UNTOGGLED_MEGA;
+// Hack PokeLobby: Pokemon cuya accion lleva la Mega reservada (OTHER_MEGA) y su forma, para poder
+// volver a su pantalla de ataques (p. ej. desde la eleccion de objetivo) y seguir viendola marcada
+BattleMon* megaReservaMon = nullptr;
+u8 megaReservaForma = 0;
+BattleMon* megaPantallaMon = nullptr;
 
 // Indicador de Mega-Evolucion activada en la pantalla de ataques (solo el jugador).
 // Sonidos del SDAT del juego (id = indice en la lista de secuencias): SEQ_SE_DECIDE5 / SEQ_SE_CANCEL1.
@@ -856,7 +861,10 @@ extern "C" void THUMB_BRANCH_LINK_BattleClient_ActionSelect_Root_0x58(BattleActi
     {
         // Reset the Mega-Evolution flag if the deleted action was supposed to Mega-Evolve
         if (BattleAction_CheckMegaEvolution(actionParam))
+        {
             megaEvolveFlag = UNTOGGLED_MEGA;
+            megaReservaMon = nullptr;
+        }
         // Hack PokeLobby: una Mega marcada con START pero sin ataque elegido no pasa al menu de otro
         // Pokemon ni al turno siguiente (se gastaba en uno que no podia megaevolucionar)
         else if (megaEvolveFlag != OTHER_MEGA)
@@ -869,7 +877,16 @@ extern "C" void THUMB_BRANCH_LINK_BattleClient_ActionSelect_Root_0x58(BattleActi
 extern "C" u32 BattleViewCmd_UI_SelectMove_Wait(BtlvCore* btlCore);
 extern "C" u32 THUMB_BRANCH_LINK_BattleClient_ActionSelectFight_0x8E(BtlvCore* btlCore)
 {
-    if (megaEvolveFlag != ALREADY_MEGA && 
+    megaPantallaMon = btlCore->activeMon;
+    // Hack PokeLobby: de vuelta en los ataques del Pokemon que ya tenia la Mega reservada (vuelta atras
+    // desde la eleccion de objetivo): la Mega sigue marcada y se puede desmarcar con START
+    if (megaEvolveFlag == OTHER_MEGA && megaReservaMon == btlCore->activeMon)
+    {
+        megaEvolveFlag = megaReservaForma;
+        megaReservaMon = nullptr;
+    }
+
+    if (megaEvolveFlag != ALREADY_MEGA &&
         megaEvolveFlag != OTHER_MEGA)
     {
         if ((GCTX_HIDGetPressedKeys() & KEY_START) == KEY_START)
@@ -928,6 +945,8 @@ extern "C" u32 THUMB_BRANCH_LINK_BattleClient_ActionSelectFight_0x9A(BattleActio
         {
             // Set the Mega-Evolution flag in the action data
             BattleAction_SetMegaEvolution(actionParam, megaEvolveFlag);
+            megaReservaMon = megaPantallaMon;
+            megaReservaForma = megaEvolveFlag;
             megaEvolveFlag = OTHER_MEGA;
         }
         else
@@ -935,6 +954,13 @@ extern "C" u32 THUMB_BRANCH_LINK_BattleClient_ActionSelectFight_0x9A(BattleActio
             // Hack PokeLobby: vuelta atras sin elegir ataque = la Mega se desmarca
             megaEvolveFlag = UNTOGGLED_MEGA;
         }
+    }
+    else if (action && megaEvolveFlag != ALREADY_MEGA &&
+             !(megaEvolveFlag == OTHER_MEGA && megaReservaMon == megaPantallaMon))
+    {
+        // Hack PokeLobby: ataque elegido sin la Mega marcada: fuera la Mega que quedara en la accion
+        // (SetFightParam no toca ese byte) de una eleccion anterior de este mismo Pokemon
+        BattleAction_ResetMegaEvolution(actionParam);
     }
     
     return action;
@@ -1191,6 +1217,7 @@ extern "C" int THUMB_BRANCH_ServerFlow_ActOrderProcMain(ServerFlow * serverFlow,
     }
     if (megaReservada)
         megaEvolveFlag = megaDelJugador ? ALREADY_MEGA : UNTOGGLED_MEGA;
+    megaReservaMon = nullptr;
 
     // Re-calc speed if any Pokémon has Mega-Evolved
     if (hasMegaEvolved)
